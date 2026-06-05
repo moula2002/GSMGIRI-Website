@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import TopHeader from './components/TopHeader';
 import Navbar from './components/Navbar';
 import Home from './pages/Home';
@@ -16,7 +16,12 @@ export default function App() {
   const [activeTab, setActiveTab] = useState('home');
   const [currency, setCurrency] = useState('INR');
   const [language, setLanguage] = useState('EN');
-  const [balance, setBalance] = useState(25000); // Starter balance in INR
+  const [balance, setBalance] = useState(() => {
+    try {
+      const saved = localStorage.getItem('gsmgiri_balance');
+      return saved !== null ? Number(saved) : 25000;
+    } catch { return 25000; }
+  });
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedProduct, setSelectedProduct] = useState(null);
   
@@ -26,8 +31,8 @@ export default function App() {
     company: 'GSM GIRI B2B'
   });
 
-  // Seeded mock order database
-  const [orders, setOrders] = useState([
+  // Seeded mock order database — loaded from localStorage on first mount
+  const SEED_ORDERS = [
     {
       id: 'TT-704192',
       title: 'Bali Beachfront Paradise - Agent Net Promo Rate (Couple)',
@@ -64,7 +69,24 @@ export default function App() {
       time: '10:05 AM',
       status: 'Confirmed'
     }
-  ]);
+  ];
+
+  const [orders, setOrders] = useState(() => {
+    try {
+      const saved = localStorage.getItem('gsmgiri_orders');
+      return saved ? JSON.parse(saved) : SEED_ORDERS;
+    } catch { return SEED_ORDERS; }
+  });
+
+  // Persist orders to localStorage whenever they change
+  useEffect(() => {
+    try { localStorage.setItem('gsmgiri_orders', JSON.stringify(orders)); } catch {}
+  }, [orders]);
+
+  // Persist balance to localStorage whenever it changes
+  useEffect(() => {
+    try { localStorage.setItem('gsmgiri_balance', String(balance)); } catch {}
+  }, [balance]);
 
   // Modal display states
   const [openAuthModal, setOpenAuthModal] = useState(false);
