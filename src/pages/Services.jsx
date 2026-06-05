@@ -543,7 +543,7 @@ export default function Services({ searchQuery, currency, onBookService }) {
                     className="bg-[#d4af37] hover:bg-[#c5a059] text-slate-950 px-3 py-1 rounded text-[10px] font-black transition-all shadow-sm flex items-center gap-1 cursor-pointer border border-[#d4af37]/35 uppercase"
                   >
                     {svc.category === 'leases' ? <KeyIcon className="w-3 h-3 text-slate-950" /> : <GlobeIcon className="w-3 h-3 text-slate-950" />}
-                    {svc.category === 'leases' ? 'Rent' : 'Book'}
+                    Purchase
                   </button>
                 </div>
               </div>
@@ -600,7 +600,7 @@ export default function Services({ searchQuery, currency, onBookService }) {
                             className="bg-[#d4af37] hover:bg-[#c5a059] text-slate-950 px-2.5 py-0.5 rounded text-[8px] font-black transition-all shadow-sm flex items-center gap-1 cursor-pointer border border-[#d4af37]/30 uppercase"
                           >
                             {svc.category === 'leases' ? <KeyIcon className="w-2.5 h-2.5 text-slate-950" /> : <GlobeIcon className="w-2.5 h-2.5 text-slate-950" />}
-                            {svc.category === 'leases' ? 'Rent' : 'Book'}
+                            Purchase
                           </button>
                         </div>
                       </div>
