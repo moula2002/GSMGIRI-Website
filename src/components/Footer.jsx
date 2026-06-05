@@ -14,38 +14,64 @@ export default function Footer({ currency }) {
   ];
 
   return (
-    <footer className="w-full bg-[#0b192c] border-t-2 border-[#d4af37] mt-16 text-slate-350">
+    <footer className="w-full mt-16 text-slate-350 font-sans">
       
-      {/* Upper Footer: Partners & Props in deep rich dark background */}
-      <div className="bg-[#070f1a] border-b border-slate-900/60">
-        
-        {/* 1. Partner Brands Carousel/List (WE ARE OFFICIAL SELLER equivalent) */}
-        <div className="max-w-7xl mx-auto px-4 py-8 border-b border-slate-800/40">
-          <div className="text-center md:text-left mb-6">
-            <span className="text-xs font-bold text-[#d4af37] uppercase tracking-widest block border-l-4 border-[#d4af37] pl-2">
-              WE ARE OFFICIAL PARTNERS
+      {/* 1. WE ARE OFFICIAL SELLER (White Background) */}
+      <div className="bg-white border-t-2 border-[#d4af37] py-8 border-b border-slate-200">
+        <div className="max-w-7xl mx-auto px-4">
+          <div className="text-left mb-6 border-l-4 border-[#d4af37] pl-2.5">
+            <span className="text-xs font-black text-slate-800 uppercase tracking-widest block">
+              WE ARE OFFICIAL SELLER
             </span>
           </div>
           
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
-            {travelPartners.map((partner, idx) => (
-              <div
-                key={idx}
-                className="bg-[#0b192c]/50 border border-slate-800/80 rounded-lg p-3 text-center hover:border-[#d4af37] transition-all duration-300 group"
-              >
-                <span className="block text-white font-extrabold text-xs group-hover:text-[#d4af37] transition-colors">
-                  {partner.name}
-                </span>
-                <span className="block text-[9px] text-slate-400 uppercase mt-0.5 tracking-wider font-semibold">
-                  {partner.desc}
-                </span>
-              </div>
-            ))}
+            
+            {/* 1. iTunes Gift Card */}
+            <div className="bg-gradient-to-br from-red-500 via-pink-500 to-orange-500 border border-red-650/10 rounded-xl p-3 flex flex-col justify-center items-center text-white h-20 shadow-sm hover:scale-[1.02] transition-transform select-none">
+              <span className="text-base font-black tracking-tight leading-none text-white">Apple</span>
+              <span className="text-[8px] uppercase tracking-wider text-white/90 font-bold mt-1">iTunes Gift Card</span>
+            </div>
+
+            {/* 2. Hydra Tool */}
+            <div className="bg-gradient-to-br from-slate-900 via-slate-950 to-black border border-slate-805 rounded-xl p-3 flex flex-col justify-center items-center text-white h-20 shadow-sm hover:scale-[1.02] transition-transform select-none">
+              <span className="text-base font-black tracking-wider leading-none text-[#d4af37]">HYDRA</span>
+              <span className="text-[8px] uppercase tracking-widest text-slate-450 font-bold mt-1">TOOL</span>
+            </div>
+
+            {/* 3. Huawei */}
+            <div className="bg-white border border-slate-200 rounded-xl p-3 flex flex-col justify-center items-center text-slate-800 h-20 shadow-sm hover:scale-[1.02] transition-transform select-none">
+              <span className="text-base font-black tracking-wide leading-none text-red-600">HUAWEI</span>
+              <span className="text-[7px] uppercase tracking-wider text-slate-450 font-bold mt-1">Authorized Reseller</span>
+            </div>
+
+            {/* 4. Falcons */}
+            <div className="bg-gradient-to-br from-blue-900 to-indigo-950 border border-slate-800 rounded-xl p-3 flex flex-col justify-center items-center text-white h-20 shadow-sm hover:scale-[1.02] transition-transform select-none">
+              <span className="text-base font-black tracking-tight leading-none text-cyan-400">Falcons</span>
+              <span className="text-[8px] uppercase tracking-widest text-slate-450 font-bold mt-1">UMT / FALCON</span>
+            </div>
+
+            {/* 5. iRemoval Pro */}
+            <div className="bg-gradient-to-br from-teal-800 to-emerald-950 border border-slate-800 rounded-xl p-3 flex flex-col justify-center items-center text-white h-20 shadow-sm hover:scale-[1.02] transition-transform select-none">
+              <span className="text-sm font-black tracking-tight leading-none text-white">iRemoval</span>
+              <span className="text-[8px] uppercase tracking-widest text-[#d4af37] font-bold mt-1">PRO</span>
+            </div>
+
+            {/* 6. Nexus */}
+            <div className="bg-black border border-slate-900 rounded-xl p-3 flex flex-col justify-center items-center text-white h-20 shadow-sm hover:scale-[1.02] transition-transform select-none">
+              <span className="text-base font-black tracking-widest leading-none text-yellow-500">NEXUS</span>
+              <span className="text-[7px] uppercase tracking-wider text-slate-450 font-bold mt-1">DFT PRO</span>
+            </div>
+
           </div>
         </div>
+      </div>
 
+      {/* Main Footer Wrapper (Navy Background) */}
+      <div className="bg-[#0b192c] text-slate-350">
+        
         {/* 2. Platform Value Props (Stats Bar equivalent) */}
-        <div className="bg-[#050b14] py-6 text-white">
+        <div className="bg-[#050b14] py-6 text-white border-b border-slate-900/40">
           <div className="max-w-7xl mx-auto px-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 text-center sm:text-left">
             
             <div className="flex flex-col sm:flex-row items-center gap-3.5">

@@ -17,8 +17,8 @@ export default function Home({ currency, onBookService, setSearchQuery, setActiv
       <div className="bg-slate-100/40 border-t border-slate-200 py-4">
         <div className="max-w-7xl mx-auto px-4 flex justify-between items-center mb-6">
           <div>
-            <h2 className="text-lg font-bold text-slate-800 uppercase tracking-tight">Best Selling Net Packages</h2>
-            <p className="text-[10px] text-slate-500 uppercase mt-0.5">Top-performing wholesale deals this week</p>
+            <h2 className="text-lg font-bold text-slate-800 uppercase tracking-tight">Best Selling Services</h2>
+            <p className="text-[10px] text-slate-500 uppercase mt-0.5">Fast & Secure Mobile Unlocking Solutions</p>
           </div>
           <button
             onClick={() => {
