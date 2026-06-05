@@ -426,34 +426,20 @@ export default function Modals({
                   <span className="text-slate-200 font-semibold">{viewCodeOrder.title}</span>
                 </div>
 
-                {/* Activation Key */}
-                {[{
-                  label: '🔑 Activation Key',
-                  value: codes.activationKey,
-                  key: 'activation'
-                }, {
-                  label: '🖥️ Server Code',
-                  value: codes.serverCode,
-                  key: 'server'
-                }, {
-                  label: '🔗 API Access Token',
-                  value: codes.apiToken,
-                  key: 'token'
-                }].map(({ label, value, key }) => (
-                  <div key={key} className="bg-[#0b192c] border border-slate-800 rounded-xl p-3.5 group">
-                    <span className="text-[9px] font-bold uppercase tracking-widest text-slate-500 block mb-1.5">{label}</span>
-                    <div className="flex items-center gap-2">
-                      <code className="flex-1 font-mono text-[11px] text-emerald-400 bg-slate-950/60 px-2.5 py-1.5 rounded-lg border border-slate-800 break-all select-all">{value}</code>
-                      <button
-                        onClick={() => handleCopy(value, key)}
-                        className="shrink-0 text-[9px] font-black uppercase tracking-wider px-2.5 py-1.5 rounded-lg border transition-all cursor-pointer"
-                        style={{ borderColor: codeCopied === key ? '#10b981' : '#d4af3740', color: codeCopied === key ? '#10b981' : '#d4af37', background: codeCopied === key ? 'rgba(16,185,129,0.1)' : 'rgba(212,175,55,0.08)' }}
-                      >
-                        {codeCopied === key ? '✓ Copied' : 'Copy'}
-                      </button>
-                    </div>
+                {/* Activation Key only */}
+                <div className="bg-[#0b192c] border border-slate-800 rounded-xl p-3.5">
+                  <span className="text-[9px] font-bold uppercase tracking-widest text-slate-500 block mb-1.5">🔑 Activation Key</span>
+                  <div className="flex items-center gap-2">
+                    <code className="flex-1 font-mono text-[11px] text-emerald-400 bg-slate-950/60 px-2.5 py-1.5 rounded-lg border border-slate-800 break-all select-all">{codes.activationKey}</code>
+                    <button
+                      onClick={() => handleCopy(codes.activationKey, 'activation')}
+                      className="shrink-0 text-[9px] font-black uppercase tracking-wider px-2.5 py-1.5 rounded-lg border transition-all cursor-pointer"
+                      style={{ borderColor: codeCopied === 'activation' ? '#10b981' : '#d4af3740', color: codeCopied === 'activation' ? '#10b981' : '#d4af37', background: codeCopied === 'activation' ? 'rgba(16,185,129,0.1)' : 'rgba(212,175,55,0.08)' }}
+                    >
+                      {codeCopied === 'activation' ? '✓ Copied' : 'Copy'}
+                    </button>
                   </div>
-                ))}
+                </div>
 
                 {/* Expiry notice */}
                 <div className="flex items-center gap-2 text-[10px] text-amber-400 bg-amber-500/10 border border-amber-500/20 rounded-xl px-3.5 py-2.5 font-bold">
