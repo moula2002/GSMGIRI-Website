@@ -117,8 +117,6 @@ export default function Footer({ currency }) {
           </div>
         </div>
 
-      </div>
-
       {/* 3. Main Directories & App Stores */}
       <div className="max-w-7xl mx-auto px-4 py-12 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-8 text-xs font-medium">
         
@@ -254,6 +252,7 @@ export default function Footer({ currency }) {
         </div>
       </div>
 
-    </footer>
+    </div>
+  </footer>
   );
 }
