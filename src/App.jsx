@@ -6,6 +6,7 @@ import Services from './pages/Services';
 import ProductDetail from './pages/ProductDetail';
 import Wallet from './pages/Wallet';
 import History from './pages/History';
+import Checkout from './pages/Checkout';
 import Footer from './components/Footer';
 import Modals from './components/Modals';
 import { GlobeIcon, KeyIcon, WalletIcon } from './components/Icons';
@@ -107,7 +108,7 @@ export default function App() {
     setFundSuccessData({ amount: amountINR, method, txId });
   };
 
-  // Booking simulation handler
+  // Booking simulation handler -> redirects to Checkout Page
   const onBookService = (service) => {
     // 1. Force Login Check
     if (!user) {
@@ -115,40 +116,9 @@ export default function App() {
       return;
     }
 
-    // 2. Balance Validation
-    if (balance < service.priceINR) {
-      setInsufficientFundsData({
-        title: service.title,
-        priceINR: service.priceINR,
-        currentBalance: balance
-      });
-      return;
-    }
-
-    // 3. Deduct Balance and Log Order
-    const updatedBalance = balance - service.priceINR;
-    setBalance(updatedBalance);
-
-    const orderId = 'TT-' + Math.floor(Math.random() * 900000 + 100000);
-    const dateObj = new Date();
-    const formattedDate = dateObj.toISOString().split('T')[0];
-    const formattedTime = dateObj.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
-
-    const newOrder = {
-      id: orderId,
-      title: service.title,
-      category: service.category,
-      type: service.type,
-      priceINR: service.priceINR,
-      client: user.username,
-      clientContact: user.company,
-      date: formattedDate,
-      time: formattedTime,
-      status: 'Confirmed'
-    };
-
-    setOrders([newOrder, ...orders]);
-    setActiveInvoice(newOrder);
+    // Redirect to checkout tab
+    setSelectedProduct(service);
+    setActiveTab('checkout');
   };
 
   // Product detail view selector
@@ -224,6 +194,21 @@ export default function App() {
             user={user}
             setOpenAuthModal={setOpenAuthModal}
             onBookService={onBookService}
+          />
+        )}
+
+        {activeTab === 'checkout' && selectedProduct && (
+          <Checkout
+            product={selectedProduct}
+            currency={currency}
+            balance={balance}
+            setBalance={setBalance}
+            user={user}
+            setOpenAuthModal={setOpenAuthModal}
+            orders={orders}
+            setOrders={setOrders}
+            setActiveTab={setActiveTab}
+            setActiveInvoice={setActiveInvoice}
           />
         )}
 
