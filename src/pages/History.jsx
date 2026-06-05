@@ -1,9 +1,29 @@
 import React, { useState } from 'react';
 import { ClockIcon, GlobeIcon, KeyIcon } from '../components/Icons';
 
+// Helper: generate a deterministic delivery code from order ID
+const generateServiceCode = (orderId) => {
+  const seed = orderId ? orderId.replace('TT-', '') : '000000';
+  const hex = () => Math.floor(parseInt(seed) * 7 % 65536).toString(16).toUpperCase().padStart(4, '0');
+  return {
+    activationKey: `GSMG-${seed}-${hex()}-X${(parseInt(seed) % 97).toString(16).toUpperCase().padStart(2, '0')}`,
+    serverCode:    `SRV::${hex()}::${seed}::UNLK`,
+    apiToken:      `eyJhbGciOiJIUzI1NiJ9.${btoa('order:' + seed).replace(/=/g, '')}.GSMGIRI`,
+    expiresAt:     new Date(Date.now() + 86400000 * 7).toISOString().split('T')[0]
+  };
+};
+
 export default function History({ orders, currency, onViewInvoice }) {
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
+  const [viewCodeOrder, setViewCodeOrder] = useState(null);
+  const [codeCopied, setCodeCopied] = useState(null);
+
+  const handleCopy = (text, key) => {
+    navigator.clipboard.writeText(text).catch(() => {});
+    setCodeCopied(key);
+    setTimeout(() => setCodeCopied(null), 2000);
+  };
 
   const formatPrice = (priceINR) => {
     if (currency === 'INR') {
@@ -62,7 +82,7 @@ export default function History({ orders, currency, onViewInvoice }) {
       {/* Section Title */}
       <div className="flex items-center gap-2 mb-8 border-l-4 border-[#d4af37] pl-3">
         <h1 className="text-2xl font-bold tracking-tight text-slate-800 uppercase">
-          Agent Order & Transaction Logs
+          Agent Order &amp; Transaction Logs
         </h1>
       </div>
 
@@ -121,7 +141,7 @@ export default function History({ orders, currency, onViewInvoice }) {
                   <th className="py-4 px-6">Date / Time</th>
                   <th className="py-4 px-6 text-right">Debit Cost</th>
                   <th className="py-4 px-6 text-center">Status</th>
-                  <th className="py-4 px-6 text-center">Receipt</th>
+                  <th className="py-4 px-6 text-center">Actions</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100 text-xs text-slate-700">
@@ -149,8 +169,8 @@ export default function History({ orders, currency, onViewInvoice }) {
 
                     {/* Client Info */}
                     <td className="py-4 px-6">
-                      <span className="font-bold text-slate-700 block">{order.client || "SaaS System"}</span>
-                      <span className="text-[10px] text-slate-450">{order.clientContact || "Direct Agent Pool"}</span>
+                      <span className="font-bold text-slate-700 block">{order.client || 'SaaS System'}</span>
+                      <span className="text-[10px] text-slate-450">{order.clientContact || 'Direct Agent Pool'}</span>
                     </td>
 
                     {/* Date / Time */}
@@ -169,14 +189,25 @@ export default function History({ orders, currency, onViewInvoice }) {
                       {getStatusBadge(order.status)}
                     </td>
 
-                    {/* Action */}
+                    {/* Actions: Invoice + View Code */}
                     <td className="py-4 px-6 text-center">
-                      <button
-                        onClick={() => onViewInvoice(order)}
-                        className="text-[10px] border border-[#d4af37]/35 hover:border-[#d4af37] hover:bg-amber-50/10 text-[#d4af37] px-2.5 py-1.5 rounded transition-all font-bold"
-                      >
-                        Invoice
-                      </button>
+                      <div className="flex items-center justify-center gap-1.5 flex-wrap">
+                        <button
+                          onClick={() => onViewInvoice(order)}
+                          className="text-[10px] border border-[#d4af37]/35 hover:border-[#d4af37] hover:bg-amber-50/10 text-[#d4af37] px-2.5 py-1.5 rounded transition-all font-bold whitespace-nowrap"
+                        >
+                          Invoice
+                        </button>
+                        <button
+                          onClick={() => setViewCodeOrder(order)}
+                          className="text-[10px] border border-[#0b192c] bg-[#0b192c] hover:bg-[#152e50] text-[#d4af37] px-2.5 py-1.5 rounded transition-all font-black flex items-center gap-1 whitespace-nowrap"
+                        >
+                          <svg xmlns="http://www.w3.org/2000/svg" className="w-2.5 h-2.5" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M17.25 6.75L22.5 12l-5.25 5.25m-10.5 0L1.5 12l5.25-5.25m7.5-3l-4.5 16.5" />
+                          </svg>
+                          View Code
+                        </button>
+                      </div>
                     </td>
                   </tr>
                 ))}
@@ -185,6 +216,115 @@ export default function History({ orders, currency, onViewInvoice }) {
           </div>
         )}
       </div>
+
+      {/* VIEW CODE POPUP MODAL */}
+      {viewCodeOrder && (() => {
+        const codes = generateServiceCode(viewCodeOrder.id);
+        return (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/90 backdrop-blur-md px-4">
+            <div className="w-full max-w-lg bg-[#070e1b] border border-[#d4af37]/30 rounded-2xl overflow-hidden shadow-2xl relative text-white">
+              {/* Header */}
+              <div className="flex items-center justify-between px-6 py-4 border-b border-[#d4af37]/20">
+                <div className="flex items-center gap-2.5">
+                  <div className="w-8 h-8 rounded-lg bg-[#d4af37]/10 border border-[#d4af37]/30 flex items-center justify-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4 text-[#d4af37]" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M17.25 6.75L22.5 12l-5.25 5.25m-10.5 0L1.5 12l5.25-5.25m7.5-3l-4.5 16.5" />
+                    </svg>
+                  </div>
+                  <div>
+                    <h3 className="text-sm font-black text-white uppercase tracking-wider">Service Delivery Code</h3>
+                    <span className="text-[9px] text-[#d4af37] font-bold uppercase tracking-widest">Order Ref: {viewCodeOrder.id}</span>
+                  </div>
+                </div>
+                <button
+                  onClick={() => { setViewCodeOrder(null); setCodeCopied(null); }}
+                  className="text-slate-500 hover:text-white p-1 transition-colors cursor-pointer"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              </div>
+
+              {/* Code Body */}
+              <div className="p-6 space-y-3 max-h-[70vh] overflow-y-auto">
+                {/* Order Info */}
+                <div className="bg-[#0b192c] border border-slate-800 rounded-xl p-3.5">
+                  <span className="text-[9px] font-bold uppercase tracking-widest text-slate-500 block mb-1">Service / Title</span>
+                  <span className="text-slate-200 font-semibold text-xs leading-snug">{viewCodeOrder.title}</span>
+                  <div className="flex gap-4 mt-2 pt-2 border-t border-slate-800">
+                    <div>
+                      <span className="text-[9px] text-slate-600 uppercase font-bold block">Type</span>
+                      <span className="text-[10px] text-slate-300 font-semibold">{viewCodeOrder.type}</span>
+                    </div>
+                    <div>
+                      <span className="text-[9px] text-slate-600 uppercase font-bold block">Date</span>
+                      <span className="text-[10px] text-slate-300 font-semibold">{viewCodeOrder.date}</span>
+                    </div>
+                    <div>
+                      <span className="text-[9px] text-slate-600 uppercase font-bold block">Status</span>
+                      <span className="text-[10px] text-emerald-400 font-bold">● {viewCodeOrder.status}</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Code Cards */}
+                {[{
+                  label: '🔑 Activation Key',
+                  value: codes.activationKey,
+                  key: 'activation'
+                }, {
+                  label: '🖥️ Server Code',
+                  value: codes.serverCode,
+                  key: 'server'
+                }, {
+                  label: '🔗 API Access Token',
+                  value: codes.apiToken,
+                  key: 'token'
+                }].map(({ label, value, key }) => (
+                  <div key={key} className="bg-[#0b192c] border border-slate-800 rounded-xl p-3.5">
+                    <span className="text-[9px] font-bold uppercase tracking-widest text-slate-500 block mb-1.5">{label}</span>
+                    <div className="flex items-center gap-2">
+                      <code className="flex-1 font-mono text-[11px] text-emerald-400 bg-slate-950/60 px-2.5 py-1.5 rounded-lg border border-slate-800 break-all select-all">
+                        {value}
+                      </code>
+                      <button
+                        onClick={() => handleCopy(value, key)}
+                        className="shrink-0 text-[9px] font-black uppercase tracking-wider px-2.5 py-1.5 rounded-lg border transition-all cursor-pointer"
+                        style={{
+                          borderColor: codeCopied === key ? '#10b981' : '#d4af3740',
+                          color: codeCopied === key ? '#10b981' : '#d4af37',
+                          background: codeCopied === key ? 'rgba(16,185,129,0.1)' : 'rgba(212,175,55,0.08)'
+                        }}
+                      >
+                        {codeCopied === key ? '✓ Copied' : 'Copy'}
+                      </button>
+                    </div>
+                  </div>
+                ))}
+
+                {/* Expiry notice */}
+                <div className="flex items-center gap-2 text-[10px] text-amber-400 bg-amber-500/10 border border-amber-500/20 rounded-xl px-3.5 py-2.5 font-bold">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="w-3.5 h-3.5 shrink-0" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                  Code valid until:&nbsp;<span className="text-white">{codes.expiresAt}</span>&nbsp;·&nbsp;Do not share with unauthorised agents.
+                </div>
+              </div>
+
+              {/* Footer */}
+              <div className="px-6 pb-5 pt-2">
+                <button
+                  onClick={() => { setViewCodeOrder(null); setCodeCopied(null); }}
+                  className="w-full bg-[#d4af37] hover:bg-[#c5a059] text-slate-950 font-black py-2.5 rounded-xl text-xs uppercase tracking-wider transition-all cursor-pointer"
+                >
+                  Close
+                </button>
+              </div>
+            </div>
+          </div>
+        );
+      })()}
     </section>
   );
 }

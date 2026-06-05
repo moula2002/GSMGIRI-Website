@@ -20,6 +20,18 @@ const DollarIcon = ({ className = "w-5 h-5" }) => (
   </svg>
 );
 
+// Helper: generate a deterministic delivery code from order ID
+const generateServiceCode = (orderId) => {
+  const seed = orderId ? orderId.replace('TT-', '') : '000000';
+  const hex = () => Math.floor(parseInt(seed) * 7 % 65536).toString(16).toUpperCase().padStart(4, '0');
+  return {
+    activationKey: `GSMG-${seed}-${hex()}-X${(parseInt(seed) % 97).toString(16).toUpperCase().padStart(2,'0')}`,
+    serverCode:    `SRV::${hex()}::${seed}::UNLK`,
+    apiToken:      `eyJhbGciOiJIUzI1NiJ9.${btoa('order:'+seed).replace(/=/g,'')}.GSMGIRI`,
+    expiresAt:     new Date(Date.now() + 86400000 * 7).toISOString().split('T')[0]
+  };
+};
+
 export default function Modals({
   openAuthModal,
   setOpenAuthModal,
@@ -35,6 +47,15 @@ export default function Modals({
 }) {
   // Auth state
   const [authTab, setAuthTab] = useState('login');
+  // View Code modal state
+  const [viewCodeOrder, setViewCodeOrder] = useState(null);
+  const [codeCopied, setCodeCopied] = useState(null);
+
+  const handleCopy = (text, key) => {
+    navigator.clipboard.writeText(text).catch(() => {});
+    setCodeCopied(key);
+    setTimeout(() => setCodeCopied(null), 2000);
+  };
   const [name, setName] = useState('GSM Giri Partner');
   const [email, setEmail] = useState('agent@gsmgiri.com');
   const [mobile, setMobile] = useState('+919876543210');
@@ -347,24 +368,113 @@ export default function Modals({
             </div>
 
             {/* Actions Footer */}
-            <div className="bg-slate-50 p-4 flex gap-3 border-t border-slate-200 justify-end">
+            <div className="bg-slate-50 p-4 flex gap-3 border-t border-slate-200 justify-between items-center flex-wrap">
               <button
                 onClick={() => window.print()}
                 className="bg-slate-100 hover:bg-slate-200 text-slate-700 px-4 py-2 rounded-lg text-xs font-bold transition-all"
               >
                 Print / Save PDF
               </button>
-              <button
-                onClick={() => setActiveInvoice(null)}
-                className="bg-[#d4af37] hover:bg-[#c5a059] text-slate-950 px-5 py-2 rounded-lg text-xs font-black transition-all cursor-pointer border border-[#d4af37]/30"
-              >
-                Done
-              </button>
+              <div className="flex gap-2">
+                <button
+                  onClick={() => setViewCodeOrder(activeInvoice)}
+                  className="bg-[#0b192c] hover:bg-[#152e50] text-[#d4af37] border border-[#d4af37]/40 hover:border-[#d4af37] px-4 py-2 rounded-lg text-xs font-black transition-all cursor-pointer flex items-center gap-1.5"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="M17.25 6.75L22.5 12l-5.25 5.25m-10.5 0L1.5 12l5.25-5.25m7.5-3l-4.5 16.5" /></svg>
+                  View Code
+                </button>
+                <button
+                  onClick={() => setActiveInvoice(null)}
+                  className="bg-[#d4af37] hover:bg-[#c5a059] text-slate-950 px-5 py-2 rounded-lg text-xs font-black transition-all cursor-pointer border border-[#d4af37]/30"
+                >
+                  Done
+                </button>
+              </div>
             </div>
 
           </div>
         </div>
       )}
+
+      {/* 3. VIEW CODE MODAL */}
+      {viewCodeOrder && (() => {
+        const codes = generateServiceCode(viewCodeOrder.id);
+        return (
+          <div className="fixed inset-0 z-[60] flex items-center justify-center bg-slate-950/90 backdrop-blur-md px-4">
+            <div className="w-full max-w-lg bg-[#070e1b] border border-[#d4af37]/30 rounded-2xl overflow-hidden shadow-2xl relative text-white animate-scale-up">
+              {/* Header */}
+              <div className="flex items-center justify-between px-6 py-4 border-b border-[#d4af37]/20">
+                <div className="flex items-center gap-2.5">
+                  <div className="w-8 h-8 rounded-lg bg-[#d4af37]/10 border border-[#d4af37]/30 flex items-center justify-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4 text-[#d4af37]" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="M17.25 6.75L22.5 12l-5.25 5.25m-10.5 0L1.5 12l5.25-5.25m7.5-3l-4.5 16.5" /></svg>
+                  </div>
+                  <div>
+                    <h3 className="text-sm font-black text-white uppercase tracking-wider">Service Delivery Code</h3>
+                    <span className="text-[9px] text-[#d4af37] font-bold uppercase tracking-widest">Order Ref: {viewCodeOrder.id}</span>
+                  </div>
+                </div>
+                <button onClick={() => setViewCodeOrder(null)} className="text-slate-500 hover:text-white p-1 transition-colors cursor-pointer">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
+                </button>
+              </div>
+
+              {/* Code body */}
+              <div className="p-6 space-y-3">
+                {/* Order Info row */}
+                <div className="bg-[#0b192c] border border-slate-800 rounded-xl p-3.5 text-xs text-slate-400 leading-snug">
+                  <span className="text-[9px] font-bold uppercase tracking-widest text-slate-500 block mb-1">Service / Title</span>
+                  <span className="text-slate-200 font-semibold">{viewCodeOrder.title}</span>
+                </div>
+
+                {/* Activation Key */}
+                {[{
+                  label: '🔑 Activation Key',
+                  value: codes.activationKey,
+                  key: 'activation'
+                }, {
+                  label: '🖥️ Server Code',
+                  value: codes.serverCode,
+                  key: 'server'
+                }, {
+                  label: '🔗 API Access Token',
+                  value: codes.apiToken,
+                  key: 'token'
+                }].map(({ label, value, key }) => (
+                  <div key={key} className="bg-[#0b192c] border border-slate-800 rounded-xl p-3.5 group">
+                    <span className="text-[9px] font-bold uppercase tracking-widest text-slate-500 block mb-1.5">{label}</span>
+                    <div className="flex items-center gap-2">
+                      <code className="flex-1 font-mono text-[11px] text-emerald-400 bg-slate-950/60 px-2.5 py-1.5 rounded-lg border border-slate-800 break-all select-all">{value}</code>
+                      <button
+                        onClick={() => handleCopy(value, key)}
+                        className="shrink-0 text-[9px] font-black uppercase tracking-wider px-2.5 py-1.5 rounded-lg border transition-all cursor-pointer"
+                        style={{ borderColor: codeCopied === key ? '#10b981' : '#d4af3740', color: codeCopied === key ? '#10b981' : '#d4af37', background: codeCopied === key ? 'rgba(16,185,129,0.1)' : 'rgba(212,175,55,0.08)' }}
+                      >
+                        {codeCopied === key ? '✓ Copied' : 'Copy'}
+                      </button>
+                    </div>
+                  </div>
+                ))}
+
+                {/* Expiry notice */}
+                <div className="flex items-center gap-2 text-[10px] text-amber-400 bg-amber-500/10 border border-amber-500/20 rounded-xl px-3.5 py-2.5 font-bold">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="w-3.5 h-3.5 shrink-0" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                  Code valid until: <span className="text-white">{codes.expiresAt}</span> &nbsp;·&nbsp; Do not share with unauthorised agents.
+                </div>
+              </div>
+
+              {/* Footer */}
+              <div className="px-6 pb-5">
+                <button
+                  onClick={() => setViewCodeOrder(null)}
+                  className="w-full bg-[#d4af37] hover:bg-[#c5a059] text-slate-950 font-black py-2.5 rounded-xl text-xs uppercase tracking-wider transition-all cursor-pointer"
+                >
+                  Close
+                </button>
+              </div>
+            </div>
+          </div>
+        );
+      })()}
 
       {/* 3. WALLET REPLENISHMENT SUCCESS SPLASH */}
       {fundSuccessData && (
