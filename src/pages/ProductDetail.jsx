@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { GlobeIcon, KeyIcon } from '../components/Icons';
 import { SERVICES_DATA } from './Services';
 
@@ -8,9 +8,15 @@ export default function ProductDetail({
   currency,
   user,
   setOpenAuthModal,
-  onBookService
+  onBookService,
+  setActiveTab
 }) {
   const [agreed, setAgreed] = useState(true);
+
+  // Scroll to top whenever this page is opened
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }, [product]);
 
   // Helper to convert prices
   const getConvertedPrice = (priceINR) => {
@@ -111,6 +117,19 @@ export default function ProductDetail({
 
   return (
     <section className="max-w-7xl mx-auto px-4 py-8 relative font-sans text-left">
+      {/* Back Button */}
+      <button
+        onClick={() => setActiveTab('services')}
+        className="mb-4 flex items-center gap-2 text-xs font-black text-slate-600 hover:text-[#d4af37] transition-colors group cursor-pointer"
+      >
+        <span className="w-7 h-7 rounded-lg bg-white border border-slate-200 group-hover:border-[#d4af37]/50 flex items-center justify-center shadow-sm transition-all group-hover:bg-amber-50/20">
+          <svg xmlns="http://www.w3.org/2000/svg" className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" />
+          </svg>
+        </span>
+        <span className="uppercase tracking-wider">Back to Services</span>
+      </button>
+
       {/* Breadcrumb */}
       <div className="text-[10px] text-slate-400 mb-6 flex items-center gap-1.5 font-bold uppercase select-none">
         <span>Home</span>

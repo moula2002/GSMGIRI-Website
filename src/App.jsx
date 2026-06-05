@@ -216,6 +216,7 @@ export default function App() {
             user={user}
             setOpenAuthModal={setOpenAuthModal}
             onBookService={onBookService}
+            setActiveTab={setActiveTab}
           />
         )}
 
