@@ -3,6 +3,7 @@ import TopHeader from './components/TopHeader';
 import Navbar from './components/Navbar';
 import Home from './pages/Home';
 import Services from './pages/Services';
+import ProductDetail from './pages/ProductDetail';
 import Wallet from './pages/Wallet';
 import History from './pages/History';
 import Footer from './components/Footer';
@@ -16,6 +17,7 @@ export default function App() {
   const [language, setLanguage] = useState('EN');
   const [balance, setBalance] = useState(25000); // Starter balance in INR
   const [searchQuery, setSearchQuery] = useState('');
+  const [selectedProduct, setSelectedProduct] = useState(null);
   
   // Simulated Logged User (pre-auth for seamless UX)
   const [user, setUser] = useState({
@@ -149,6 +151,12 @@ export default function App() {
     setActiveInvoice(newOrder);
   };
 
+  // Product detail view selector
+  const handleProductSelect = (service) => {
+    setSelectedProduct(service);
+    setActiveTab('product-detail');
+  };
+
   return (
     <div className="flex flex-col min-h-screen bg-slate-50 text-slate-800 antialiased selection:bg-teal-500/15 selection:text-teal-900">
       {/* Scroll to top header news ticker */}
@@ -175,7 +183,7 @@ export default function App() {
         {activeTab === 'home' && (
           <Home
             currency={currency}
-            onBookService={onBookService}
+            onBookService={handleProductSelect}
             setSearchQuery={setSearchQuery}
             setActiveTab={setActiveTab}
           />
@@ -203,9 +211,20 @@ export default function App() {
             <Services
               searchQuery={searchQuery}
               currency={currency}
-              onBookService={onBookService}
+              onBookService={handleProductSelect}
             />
           </div>
+        )}
+
+        {activeTab === 'product-detail' && selectedProduct && (
+          <ProductDetail
+            product={selectedProduct}
+            setProduct={setSelectedProduct}
+            currency={currency}
+            user={user}
+            setOpenAuthModal={setOpenAuthModal}
+            onBookService={onBookService}
+          />
         )}
 
         {activeTab === 'wallet' && (

@@ -116,7 +116,7 @@ const PROMO_COLUMNS = [
   }
 ];
 
-const SERVICES_DATA = {
+export const SERVICES_DATA = {
   bestSelling: [
     {
       id: 'bs1',
