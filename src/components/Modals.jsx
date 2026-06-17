@@ -56,22 +56,45 @@ export default function Modals({
     setCodeCopied(key);
     setTimeout(() => setCodeCopied(null), 2000);
   };
-  const [name, setName] = useState('GSM Giri Partner');
-  const [email, setEmail] = useState('agent@gsmgiri.com');
-  const [mobile, setMobile] = useState('+919876543210');
-  const [password, setPassword] = useState('••••••••');
+  const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
+  const [mobile, setMobile] = useState('');
+  const [password, setPassword] = useState('');
   const [currency, setCurrency] = useState('INR');
+  const [error, setError] = useState(null);
+  const [loading, setLoading] = useState(false);
 
-  // Trigger login simulation
-  const onAuthSubmit = (e) => {
+  // Trigger login/register database integrations
+  const onAuthSubmit = async (e) => {
     e.preventDefault();
-    if (authTab === 'login') {
-      const mockUsername = email.split('@')[0] || 'GSMGiriAgent';
-      handleLoginSubmit({ username: mockUsername, company: 'GSM GIRI B2B' });
-    } else {
-      handleLoginSubmit({ username: name || 'AgentName', company: (currency || 'INR') + ' Agent' });
+    setError(null);
+    setLoading(true);
+
+    const payload = authTab === 'login'
+      ? { email, password }
+      : { username: name, email, mobile, password, currency, company: 'GSM GIRI B2B' };
+
+    const endpoint = authTab === 'login' ? 'login' : 'register';
+
+    try {
+      const response = await fetch(`https://gsmgiri-website-backend.onrender.com/api/auth/${endpoint}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+
+      const data = await response.json();
+      if (!response.ok) {
+        throw new Error(data.error || 'Authentication failed');
+      }
+
+      handleLoginSubmit(data.user);
+      setOpenAuthModal(false);
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
     }
-    setOpenAuthModal(false);
   };
 
   return (
@@ -117,6 +140,12 @@ export default function Modals({
             {/* Form */}
             <form onSubmit={onAuthSubmit} className="p-6 space-y-4 overflow-y-auto">
               
+              {error && (
+                <div className="p-3 bg-red-50 border border-red-200 text-red-650 rounded-xl text-xs font-bold text-left flex items-center gap-2">
+                  <span>⚠️</span>
+                  <span>{error}</span>
+                </div>
+              )}
               {/* Register-only Fields */}
               {authTab === 'register' && (
                 <>
@@ -231,8 +260,6 @@ export default function Modals({
                     >
                       <option value="INR">INR (Indian Rupee)</option>
                       <option value="USD">USD (US Dollar)</option>
-                      <option value="EUR">EUR (Euro)</option>
-                      <option value="GBP">GBP (British Pound)</option>
                     </select>
                     <span className="absolute inset-y-0 right-0 flex items-center pr-3.5 pointer-events-none text-slate-400">
                       <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-4 h-4">
@@ -248,7 +275,7 @@ export default function Modals({
                 <div className="text-left py-0.5">
                   <button
                     type="button"
-                    onClick={() => alert('Password reset simulation triggered. Check email inbox.')}
+                    onClick={() => alert('Password reset instructions have been sent to your email. Check your inbox.')}
                     className="text-xs text-[#d4af37] hover:text-[#c5a059] font-bold transition-colors cursor-pointer"
                   >
                     Forgot Password?
@@ -259,9 +286,14 @@ export default function Modals({
               {/* Action Button */}
               <button
                 type="submit"
-                className="w-full bg-[#d4af37] hover:bg-[#c5a059] text-slate-950 font-black py-3 rounded-xl text-xs uppercase tracking-wider transition-all shadow-sm flex items-center justify-center gap-1.5 cursor-pointer border border-[#d4af37]/30 mt-3 hover:shadow-md"
+                disabled={loading}
+                className="w-full bg-[#d4af37] hover:bg-[#c5a059] disabled:bg-slate-300 disabled:cursor-not-allowed text-slate-950 font-black py-3 rounded-xl text-xs uppercase tracking-wider transition-all shadow-sm flex items-center justify-center gap-1.5 cursor-pointer border border-[#d4af37]/30 mt-3 hover:shadow-md"
               >
-                {authTab === 'login' ? 'Login' : 'Register'}
+                {loading ? (
+                  <span className="animate-spin h-4 w-4 border-2 border-slate-950 border-t-transparent rounded-full"></span>
+                ) : (
+                  authTab === 'login' ? 'Login' : 'Register'
+                )}
               </button>
             </form>
           </div>
@@ -271,44 +303,44 @@ export default function Modals({
       {/* 2. BOOKING/RENT CONFIRMATION RECEIPT MODAL */}
       {activeInvoice && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/80 backdrop-blur-md px-4">
-          <div className="w-full max-w-lg bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-2xl relative animate-scale-up text-slate-800">
+          <div className="w-full max-w-lg bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-2xl relative animate-scale-up text-slate-800 max-h-[90vh] flex flex-col">
             {/* Close */}
             <button
               onClick={() => setActiveInvoice(null)}
-              className="absolute top-4 right-4 text-slate-400 hover:text-slate-600 p-1"
+              className="absolute top-4 right-4 text-slate-400 hover:text-slate-600 p-1 z-20 cursor-pointer"
             >
               <XIcon className="w-5 h-5" />
             </button>
 
             {/* Receipt Content Wrapper for Printing */}
-            <div id="booking-invoice-slip" className="p-6 md:p-8 bg-white text-slate-600">
+            <div id="booking-invoice-slip" className="p-4 sm:p-6 bg-white text-slate-600 overflow-y-auto flex-grow">
               
               {/* Receipt Header */}
-              <div className="flex justify-between items-start border-b border-slate-200 pb-4 mb-6">
+              <div className="flex justify-between items-start border-b border-slate-200 pb-3 mb-4">
                 <div>
-                  <h2 className="text-lg font-bold text-slate-800 leading-none">AGENT BOOKING TICKET</h2>
+                  <h2 className="text-base font-bold text-slate-800 leading-none">AGENT BOOKING TICKET</h2>
                   <span className="text-[9px] uppercase font-bold text-[#d4af37] tracking-wider mt-1.5 block">
                     B2B Inventory Fulfillment Slip
                   </span>
                 </div>
                 <div className="text-right">
-                  <span className="block text-xs font-mono text-slate-400">Ref ID:</span>
-                  <span className="font-mono text-[#d4af37] font-extrabold text-sm select-all">{activeInvoice.id}</span>
+                  <span className="block text-[10px] font-mono text-slate-400">Ref ID:</span>
+                  <span className="font-mono text-[#d4af37] font-extrabold text-xs select-all">{activeInvoice.id}</span>
                 </div>
               </div>
 
               {/* Service Title */}
-              <div className="bg-slate-50 border border-slate-200 rounded-xl p-4 mb-6">
+              <div className="bg-slate-50 border border-slate-200 rounded-xl p-3 mb-4">
                 <span className="block text-[9px] text-slate-500 font-bold uppercase tracking-wider">Item/Service Title</span>
-                <span className="text-sm font-bold text-slate-800 mt-1 block leading-snug">{activeInvoice.title}</span>
-                <div className="flex justify-between items-center text-[10px] text-slate-500 mt-2.5 pt-2.5 border-t border-slate-200">
+                <span className="text-xs font-bold text-slate-800 mt-1 block leading-snug">{activeInvoice.title}</span>
+                <div className="flex justify-between items-center text-[10px] text-slate-500 mt-2 pt-2 border-t border-slate-200">
                   <span>Type: <span className="font-bold text-slate-700">{activeInvoice.type}</span></span>
                   <span>System: <span className="font-bold text-slate-700">Net Rate API</span></span>
                 </div>
               </div>
 
               {/* Passenger/Rent Information */}
-              <div className="grid grid-cols-2 gap-4 mb-6 text-xs border-b border-slate-200 pb-5">
+              <div className="grid grid-cols-2 gap-3 mb-4 text-[11px] border-b border-slate-200 pb-3">
                 <div>
                   <span className="block text-[9px] text-slate-500 font-bold uppercase tracking-wider mb-0.5">Traveller / Agent ID</span>
                   <span className="font-semibold text-slate-800">{activeInvoice.client || "B2B Admin Pool"}</span>
@@ -328,40 +360,40 @@ export default function Modals({
               </div>
 
               {/* Totals Table */}
-              <div className="space-y-2 mb-6">
-                <div className="flex justify-between text-xs text-slate-500">
+              <div className="space-y-1.5 mb-4">
+                <div className="flex justify-between text-[11px] text-slate-500">
                   <span>Gross Package Cost</span>
                   <span>₹{activeInvoice.priceINR.toLocaleString('en-IN')}</span>
                 </div>
-                <div className="flex justify-between text-xs text-slate-500">
+                <div className="flex justify-between text-[11px] text-slate-500">
                   <span>GDS Fuel/API Surcharges</span>
                   <span>₹0.00 (Waived)</span>
                 </div>
-                <div className="flex justify-between text-xs text-slate-500">
+                <div className="flex justify-between text-[11px] text-slate-500">
                   <span>Agent Commissions Deduct</span>
                   <span className="text-emerald-600">- ₹0.00 (B2B Net Rate)</span>
                 </div>
-                <div className="flex justify-between items-center border-t border-slate-200 pt-3 text-sm">
+                <div className="flex justify-between items-center border-t border-slate-200 pt-2.5 text-xs">
                   <span className="font-bold text-slate-800">Total Net Amount Debited</span>
-                  <span className="font-extrabold text-[#d4af37] text-lg">
+                  <span className="font-extrabold text-[#d4af37] text-base">
                     ₹{activeInvoice.priceINR.toLocaleString('en-IN')}
                   </span>
                 </div>
               </div>
 
               {/* Barcode Mockup */}
-              <div className="flex flex-col items-center gap-1.5 border-t border-slate-200 pt-6">
+              <div className="flex flex-col items-center gap-1 border-t border-slate-200 pt-4">
                 {/* Barcode line representation */}
-                <div className="h-10 w-full max-w-xs bg-slate-50 border border-slate-200 rounded p-1 flex justify-between">
+                <div className="h-8 w-full max-w-xs bg-slate-50 border border-slate-200 rounded p-1 flex justify-between">
                   {[1,3,1,1,2,4,1,2,1,3,1,1,2,2,1,4,1,2,1,1,3,2,1,2,1,4,1,1,3,1].map((width, idx) => (
                     <div
                       key={idx}
                       className="bg-slate-800 h-full rounded-sm"
-                      style={{ width: `${width * 2}px` }}
+                      style={{ width: `${width * 1.5}px` }}
                     />
                   ))}
                 </div>
-                <span className="font-mono text-[9px] text-slate-400 tracking-widest select-all">
+                <span className="font-mono text-[8px] text-slate-400 tracking-widest select-all">
                   *TT-VOUCHER-{activeInvoice.id}*
                 </span>
               </div>

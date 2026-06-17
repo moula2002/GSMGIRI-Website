@@ -35,12 +35,13 @@
 
 /* Custom styles and animations */
 @keyframes marquee {
-  0% {
-    transform: translateX(0%);
-  }
-  100% {
-    transform: translateX(-50%);
-  }
+  0%   { transform: translateX(0%); }
+  100% { transform: translateX(-50%); }
+}
+
+@keyframes marquee-reverse {
+  0%   { transform: translateX(-50%); }
+  100% { transform: translateX(0%); }
 }
 
 .animate-marquee {
@@ -49,7 +50,14 @@
   animation: marquee 25s linear infinite;
 }
 
-.animate-marquee:hover {
+.animate-marquee-reverse {
+  display: inline-flex;
+  white-space: nowrap;
+  animation: marquee-reverse 30s linear infinite;
+}
+
+.animate-marquee:hover,
+.animate-marquee-reverse:hover {
   animation-play-state: paused;
 }
 
@@ -81,7 +89,7 @@ html, body {
   background-color: #ffffff; /* White background */
   color: #333333; /* Dark gray text */
   font-family: 'Plus Jakarta Sans', 'Inter', system-ui, sans-serif;
-  overflow-x: hidden;
+  overflow-x: clip;
 }
 
 /* Smooth selection */

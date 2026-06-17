@@ -1,11 +1,11 @@
 import React from 'react';
 import Hero from './Hero';
-import { GlobeIcon, KeyIcon } from '../components/Icons';
+import { GlobeIcon, KeyIcon } from '../components/common/Icons';
 import bannerGsmGiri from '../assets/banner_gsmgiri.png';
 import bannerNexaPro from '../assets/banner_nexapro_tool.png';
 import bannerOctoplus from '../assets/banner_octoplus.png';
 
-export default function Home({
+export default function HomePage({
   services = [],
   banners = [],
   promoColumns: dbPromoColumns = [],
@@ -15,7 +15,6 @@ export default function Home({
   setSearchQuery,
   setActiveTab
 }) {
-  // Filter lists from MongoDB using boolean flags
   const bestSellingServices = (services || []).filter(s => s.isBestSelling === true);
   const recentAddedServices = [...(services || [])]
     .sort((a, b) => {
@@ -46,7 +45,6 @@ export default function Home({
     };
   });
 
-  // Custom visual badge thumbnails mapping to match the screenshot styles
   const getServiceThumbnail = (svc) => {
     if (svc.image) {
       return (
@@ -128,9 +126,6 @@ export default function Home({
     );
   };
 
-  // Render a clean service card exactly matching the screenshot UI
-  // Shows only the logo/thumbnail on the left, and title + processing badge on the right.
-  // Clickable card redirects to the service detail view.
   const renderServiceCard = (svc) => {
     return (
       <div
@@ -138,10 +133,7 @@ export default function Home({
         onClick={() => onBookService(svc)}
         className="bg-white border border-slate-200/80 rounded-xl p-4 hover:border-slate-350 hover:shadow flex items-center gap-4 group cursor-pointer text-left h-24 select-none"
       >
-        {/* Left Side: Thumbnail */}
         {getServiceThumbnail(svc)}
-
-        {/* Right Side: Title and Processing Badge */}
         <div className="flex-1 flex flex-col justify-center min-w-0">
           <h3 className="text-xs font-bold text-slate-700 group-hover:text-slate-900 leading-snug truncate-2-lines uppercase tracking-tight">
             {svc.title}
@@ -158,7 +150,6 @@ export default function Home({
 
   return (
     <div>
-      {/* Carousel & Search Bar */}
       <Hero
         banners={banners}
         onSearchQuery={(q) => {
@@ -167,21 +158,15 @@ export default function Home({
         }}
       />
 
-      {/* Sections Container */}
       <div className="max-w-7xl mx-auto px-4 py-8 space-y-8 font-sans">
-        
-        {/* Dynamic Promo Columns (Banner Down Grid) */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {promoColumns.map((col, idx) => (
             <div key={idx} className="bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-sm flex flex-col">
-              
-              {/* Banner Image */}
               <div className="h-28 overflow-hidden relative border-b border-slate-150 shrink-0">
                 <img src={col.banner} alt={col.title} className="w-full h-full object-cover" />
                 <div className="absolute inset-0 bg-slate-950/20"></div>
               </div>
 
-              {/* List of 3 items stacked vertically */}
               <div className="p-4 flex-1 flex flex-col justify-between divide-y divide-slate-100">
                 {col.items.map((svc) => (
                   <div 
@@ -189,10 +174,7 @@ export default function Home({
                     onClick={() => onBookService(svc)}
                     className="py-3.5 first:pt-0 last:pb-0 flex items-center gap-3.5 group cursor-pointer"
                   >
-                    {/* Thumbnail */}
                     {getServiceThumbnail(svc)}
-
-                    {/* Details */}
                     <div className="flex-1 min-w-0">
                       <h4 className="text-[11px] font-black text-slate-700 group-hover:text-[#d4af37] transition-colors leading-snug truncate-2-lines uppercase tracking-tight">
                         {svc.title}
@@ -215,16 +197,13 @@ export default function Home({
           ))}
         </div>
 
-        {/* Best Selling Section */}
         <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm">
-          {/* Section Header */}
           <div className="flex items-center gap-2 mb-6 border-l-4 border-teal-600 pl-3">
             <h2 className="text-sm font-bold tracking-wider text-teal-700 uppercase">
               Best Selling
             </h2>
           </div>
 
-          {/* Grid display */}
           {bestSellingServices.length === 0 ? (
             <div className="text-center py-12">
               <p className="text-sm text-slate-400 font-semibold italic">No best-selling services found.</p>
@@ -236,16 +215,13 @@ export default function Home({
           )}
         </div>
 
-        {/* Recent Added Section */}
         <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm">
-          {/* Section Header */}
           <div className="flex items-center gap-2 mb-6 border-l-4 border-teal-600 pl-3">
             <h2 className="text-sm font-bold tracking-wider text-teal-700 uppercase">
               Recent Added
             </h2>
           </div>
 
-          {/* Grid display */}
           {recentAddedServices.length === 0 ? (
             <div className="text-center py-12">
               <p className="text-sm text-slate-400 font-semibold italic">No recently added services found.</p>
@@ -256,8 +232,6 @@ export default function Home({
             </div>
           )}
         </div>
-
-
       </div>
     </div>
   );

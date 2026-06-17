@@ -3,134 +3,314 @@ import TopHeader from './components/TopHeader';
 import Navbar from './components/Navbar';
 import Home from './pages/Home';
 import Services from './pages/Services';
+import CategoryServices from './pages/CategoryServices';
 import ProductDetail from './pages/ProductDetail';
 import Wallet from './pages/Wallet';
 import History from './pages/History';
-import Checkout from './pages/Checkout';
 import Footer from './components/Footer';
 import Modals from './components/Modals';
 import { GlobeIcon, KeyIcon, WalletIcon } from './components/Icons';
 import dashboardImg from './assets/dashboard.png';
+import About from './pages/About';
+import Contact from './pages/Contact';
+import CartPage from './pages/CartPage';
+import Dashboard from './pages/Dashboard';
+import Statement from './pages/Statement';
+import ImeiProductsPage from './pages/ImeiProductsPage';
+import RemoteProductsPage from './pages/RemoteProductsPage';
+
+const API_BASE = 'https://gsmgiri-website-backend.onrender.com/api';
 
 export default function App() {
   const [activeTab, setActiveTab] = useState('home');
   const [currency, setCurrency] = useState('INR');
   const [language, setLanguage] = useState('EN');
-  const [balance, setBalance] = useState(() => {
-    try {
-      const saved = localStorage.getItem('gsmgiri_balance');
-      return saved !== null ? Number(saved) : 25000;
-    } catch { return 25000; }
-  });
+  const [balance, setBalance] = useState(0);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedProduct, setSelectedProduct] = useState(null);
-  
-  // Simulated Logged User (pre-auth for seamless UX)
-  const [user, setUser] = useState({
-    username: 'GSMGiriAgent',
-    company: 'GSM GIRI B2B'
-  });
 
-  // Seeded mock order database — loaded from localStorage on first mount
-  const SEED_ORDERS = [
-    {
-      id: 'TT-704192',
-      title: 'Bali Beachfront Paradise - Agent Net Promo Rate (Couple)',
-      category: 'packages',
-      type: 'B2B Package',
-      priceINR: 35000,
-      client: 'Rajesh Sharma',
-      clientContact: 'rajesh.sharma@gmail.com',
-      date: '2026-06-03',
-      time: '14:23 PM',
-      status: 'Confirmed'
-    },
-    {
-      id: 'TT-502891',
-      title: 'White-label Flight Search Engine - 24 Hours Key Lease',
-      category: 'leases',
-      type: 'API Engine Lease',
-      priceINR: 1500,
-      client: 'System Admin',
-      clientContact: 'API Pool Account',
-      date: '2026-06-04',
-      time: '09:12 AM',
-      status: 'Completed'
-    },
-    {
-      id: 'TT-103984',
-      title: 'Global Visa Eligibility Checking API - 50 Credit Pack',
-      category: 'credits',
-      type: 'Credit Pack',
-      priceINR: 4000,
-      client: 'Sunita Roy',
-      clientContact: 'sunita.travels@yahoo.com',
-      date: '2026-06-05',
-      time: '10:05 AM',
-      status: 'Confirmed'
-    }
-  ];
-
-  const [orders, setOrders] = useState(() => {
+  // Logged User
+  const [user, setUser] = useState(() => {
     try {
-      const saved = localStorage.getItem('gsmgiri_orders');
-      return saved ? JSON.parse(saved) : SEED_ORDERS;
-    } catch { return SEED_ORDERS; }
+      const stored = localStorage.getItem('gsmgiri_user');
+      return stored ? JSON.parse(stored) : null;
+    } catch {
+      return null;
+    }
   });
 
-  // Persist orders to localStorage whenever they change
-  useEffect(() => {
-    try { localStorage.setItem('gsmgiri_orders', JSON.stringify(orders)); } catch {}
-  }, [orders]);
+  const [orders, setOrders] = useState([]);
+  const [services, setServices] = useState([]);
+  const [imeiProducts, setImeiProducts] = useState([]);
+  const [remoteProducts, setRemoteProducts] = useState([]);
+  const [banners, setBanners] = useState([]);
+  const [categories, setCategories] = useState([]);
+  const [promoColumns, setPromoColumns] = useState([]);
+  const [clients, setClients] = useState([]);
+  const [activeCategory, setActiveCategory] = useState('all');
+  const [selectedCategorySlug, setSelectedCategorySlug] = useState('');
+  const [usersList, setUsersList] = useState([]);
 
-  // Persist balance to localStorage whenever it changes
+  const fetchUsersList = async () => {
+    if (!user || user.role !== 'admin') return;
+    try {
+      const response = await fetch(`${API_BASE}/admin/users`);
+      if (response.ok) {
+        const data = await response.json();
+        setUsersList(data.users || []);
+      }
+    } catch (error) {
+      console.error('Failed to load users list from server:', error);
+    }
+  };
+
+  const onAdminAddFunds = async (targetUserEmail, amount) => {
+    if (!user || user.role !== 'admin') return false;
+    try {
+      const response = await fetch(`${API_BASE}/admin/users/add-funds`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: targetUserEmail, amount })
+      });
+      if (response.ok) {
+        fetchUsersList();
+        return true;
+      }
+      return false;
+    } catch (error) {
+      console.error('Admin adding funds failed:', error);
+      return false;
+    }
+  };
+
+  // Cart & Wishlist States
+  const [cart, setCart] = useState(() => {
+    try {
+      const stored = localStorage.getItem('gsm_cart');
+      return stored ? JSON.parse(stored) : [];
+    } catch { return []; }
+  });
+
+  const [wishlist, setWishlist] = useState(() => {
+    try {
+      const stored = localStorage.getItem('gsm_wishlist');
+      return stored ? JSON.parse(stored) : [];
+    } catch { return []; }
+  });
+
+  // Guard protected tabs & redirect guests to login modal
   useEffect(() => {
-    try { localStorage.setItem('gsmgiri_balance', String(balance)); } catch {}
-  }, [balance]);
+    const protectedTabs = ['checkout', 'wallet', 'history', 'dashboard', 'statement'];
+    if (protectedTabs.includes(activeTab) && !user) {
+      setActiveTab('home');
+      setOpenAuthModal(true);
+    }
+  }, [activeTab, user]);
+
+  // Synchronize storage updates across tabs/components
+  useEffect(() => {
+    const syncStorage = () => {
+      try {
+        const storedCart = localStorage.getItem('gsm_cart');
+        if (storedCart) setCart(JSON.parse(storedCart));
+        const storedWish = localStorage.getItem('gsm_wishlist');
+        if (storedWish) setWishlist(JSON.parse(storedWish));
+      } catch (e) {
+        console.error(e);
+      }
+    };
+    window.addEventListener('storage', syncStorage);
+    return () => window.removeEventListener('storage', syncStorage);
+  }, []);
+
+  // Load state from the server on mount or when user changes
+  useEffect(() => {
+    const fetchInitialData = async () => {
+      try {
+        const headers = {};
+        if (user && user.email) {
+          headers['x-user-email'] = user.email;
+        }
+        const response = await fetch(`${API_BASE}/data`, { headers });
+        if (response.ok) {
+          const data = await response.json();
+          if (data.balance !== undefined) setBalance(data.balance);
+          if (data.orders) setOrders(data.orders);
+        }
+        if (user && user.role === 'admin') {
+          fetchUsersList();
+        }
+      } catch (error) {
+        console.error('Failed to load initial data from server:', error);
+      }
+    };
+
+    fetchInitialData();
+
+    // Set up dynamic polling interval for user data (orders, balance) every 5 seconds
+    const intervalId = setInterval(fetchInitialData, 5000);
+
+    const fetchServices = async () => {
+      try {
+        const response = await fetch(`${API_BASE}/services`);
+        if (response.ok) {
+          const data = await response.json();
+          setServices(data);
+        }
+      } catch (error) {
+        console.error('Failed to load services from server:', error);
+      }
+    };
+
+    const fetchBanners = async () => {
+      try {
+        const response = await fetch(`${API_BASE}/banners`);
+        if (response.ok) {
+          const data = await response.json();
+          setBanners(data);
+        }
+      } catch (error) {
+        console.error('Failed to load banners from server:', error);
+      }
+    };
+
+    const fetchCategories = async () => {
+      try {
+        const response = await fetch(`${API_BASE}/categories`);
+        if (response.ok) {
+          const data = await response.json();
+          setCategories(data);
+        }
+      } catch (error) {
+        console.error('Failed to load categories from server:', error);
+      }
+    };
+
+    const fetchPromoColumns = async () => {
+      try {
+        const response = await fetch(`${API_BASE}/promo-columns`);
+        if (response.ok) {
+          const data = await response.json();
+          setPromoColumns(data);
+        }
+      } catch (error) {
+        console.error('Failed to load promo columns from server:', error);
+      }
+    };
+
+    const fetchClients = async () => {
+      try {
+        const response = await fetch(`${API_BASE}/clients`);
+        if (response.ok) {
+          const data = await response.json();
+          setClients(data);
+        }
+      } catch (error) {
+        console.error('Failed to load clients from server:', error);
+      }
+    };
+
+    const fetchImeiProducts = async () => {
+      try {
+        const response = await fetch(`${API_BASE}/imei-products`);
+        if (response.ok) {
+          const data = await response.json();
+          setImeiProducts(data);
+        }
+      } catch (error) {
+        console.error('Failed to load IMEI products from server:', error);
+      }
+    };
+
+    const fetchRemoteProducts = async () => {
+      try {
+        const response = await fetch(`${API_BASE}/remote-products`);
+        if (response.ok) {
+          const data = await response.json();
+          setRemoteProducts(data);
+        }
+      } catch (error) {
+        console.error('Failed to load remote products from server:', error);
+      }
+    };
+
+    fetchServices();
+    fetchBanners();
+    fetchCategories();
+    fetchPromoColumns();
+    fetchClients();
+    fetchImeiProducts();
+    fetchRemoteProducts();
+
+    return () => {
+      clearInterval(intervalId);
+    };
+  }, [user]);
 
   // Modal display states
   const [openAuthModal, setOpenAuthModal] = useState(false);
   const [activeInvoice, setActiveInvoice] = useState(null);
   const [fundSuccessData, setFundSuccessData] = useState(null);
   const [insufficientFundsData, setInsufficientFundsData] = useState(null);
+  const [productBackTab, setProductBackTab] = useState('services');
 
   // Authentication Handlers
   const handleLoginSubmit = (userData) => {
     setUser(userData);
+    if (userData) {
+      localStorage.setItem('gsmgiri_user', JSON.stringify(userData));
+    } else {
+      localStorage.removeItem('gsmgiri_user');
+    }
   };
-  const handleLogout = () => {
-    setUser(null);
+
+  const handleLogout = async () => {
+    try {
+      await fetch(`${API_BASE}/auth/logout`, { method: 'POST' });
+      setUser(null);
+      localStorage.removeItem('gsmgiri_user');
+      setActiveTab('home');
+    } catch (error) {
+      console.error('Logout failed:', error);
+    }
   };
 
   // Wallet Funding simulation handler
-  const onAddFunds = (amountINR, method) => {
-    const newBalance = balance + amountINR;
-    setBalance(newBalance);
+  const onAddFunds = async (amountINR, method) => {
+    if (!user || !user.email) {
+      setOpenAuthModal(true);
+      return;
+    }
+    try {
+      const response = await fetch(`${API_BASE}/balance/add`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ amount: amountINR, method, email: user.email })
+      });
+      if (response.ok) {
+        const data = await response.json();
+        setBalance(data.balance);
 
-    const txId = 'TXN-' + Math.floor(Math.random() * 90000000 + 10000000);
-    const dateObj = new Date();
-    const formattedDate = dateObj.toISOString().split('T')[0];
-    const formattedTime = dateObj.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+        // Reload all data to ensure orders/transactions sync
+        const headers = { 'x-user-email': user.email };
+        const dataRes = await fetch(`${API_BASE}/data`, { headers });
+        if (dataRes.ok) {
+          const fullData = await dataRes.json();
+          setOrders(fullData.orders);
+        }
+        setFundSuccessData({ amount: amountINR, method, txId: data.transaction.txId });
 
-    // Append to orders logs as funding log
-    const fundLog = {
-      id: txId,
-      title: `Added Wallet Funds via ${method.toUpperCase()}`,
-      category: 'credits',
-      type: 'Wallet Deposit',
-      priceINR: amountINR,
-      client: user ? user.username : 'Guest Agent',
-      clientContact: user ? user.company : 'Direct Pool',
-      date: formattedDate,
-      time: formattedTime,
-      status: 'Completed'
-    };
-
-    setOrders([fundLog, ...orders]);
-    setFundSuccessData({ amount: amountINR, method, txId });
+        // If there was a selected product, redirect directly to Checkout after success modal dismisses
+        setTimeout(() => {
+          setActiveTab('checkout');
+        }, 3000);
+      }
+    } catch (error) {
+      console.error('Adding funds failed:', error);
+    }
   };
 
-  // Booking simulation handler -> redirects to Checkout Page
+  // Booking simulation handler -> redirects directly to Wallet (INR Fund Add)
   const onBookService = (service) => {
     // 1. Force Login Check
     if (!user) {
@@ -138,14 +318,14 @@ export default function App() {
       return;
     }
 
-    // Redirect to checkout tab
     setSelectedProduct(service);
-    setActiveTab('checkout');
+    setActiveTab('wallet');
   };
 
-  // Product detail view selector
-  const handleProductSelect = (service) => {
+  // Product detail view selector — tracks which page to go back to
+  const handleProductSelect = (service, sourcePage = 'services') => {
     setSelectedProduct(service);
+    setProductBackTab(sourcePage);
     setActiveTab('product-detail');
   };
 
@@ -164,16 +344,29 @@ export default function App() {
         activeTab={activeTab}
         setActiveTab={setActiveTab}
         currency={currency}
+        setCurrency={setCurrency}
         balance={balance}
         user={user}
         setOpenAuthModal={setOpenAuthModal}
         handleLogout={handleLogout}
+        setSearchQuery={setSearchQuery}
+        categories={categories}
+        activeCategory={activeCategory}
+        setActiveCategory={setActiveCategory}
+        selectedCategorySlug={selectedCategorySlug}
+        setSelectedCategorySlug={setSelectedCategorySlug}
+        cart={cart}
+        wishlist={wishlist}
       />
 
       {/* Panel routing container */}
       <main className="flex-grow">
         {activeTab === 'home' && (
           <Home
+            services={services}
+            banners={banners}
+            promoColumns={promoColumns}
+            clients={clients}
             currency={currency}
             onBookService={handleProductSelect}
             setSearchQuery={setSearchQuery}
@@ -201,45 +394,72 @@ export default function App() {
             )}
 
             <Services
+              services={services}
               searchQuery={searchQuery}
+              promoColumns={promoColumns}
               currency={currency}
               onBookService={handleProductSelect}
+              categories={categories}
+              activeCategory={activeCategory}
+              setActiveCategory={setActiveCategory}
             />
           </div>
+        )}
+
+        {activeTab === 'category-services' && (
+          <CategoryServices
+            services={services}
+            categorySlug={selectedCategorySlug}
+            categories={categories}
+            currency={currency}
+            onBookService={handleProductSelect}
+            setActiveTab={setActiveTab}
+          />
+        )}
+
+        {activeTab === 'imei-products' && (
+          <ImeiProductsPage
+            imeiProducts={imeiProducts}
+            currency={currency}
+            onProductSelect={(p) => handleProductSelect(p, 'imei-products')}
+            user={user}
+            setOpenAuthModal={setOpenAuthModal}
+          />
+        )}
+
+        {activeTab === 'remote-products' && (
+          <RemoteProductsPage
+            remoteProducts={remoteProducts}
+            currency={currency}
+            onProductSelect={(p) => handleProductSelect(p, 'remote-products')}
+            user={user}
+            setOpenAuthModal={setOpenAuthModal}
+          />
         )}
 
         {activeTab === 'product-detail' && selectedProduct && (
           <ProductDetail
             product={selectedProduct}
+            services={services}
             setProduct={setSelectedProduct}
             currency={currency}
             user={user}
             setOpenAuthModal={setOpenAuthModal}
             onBookService={onBookService}
             setActiveTab={setActiveTab}
+            backTab={productBackTab}
+            cart={cart}
+            setCart={setCart}
+            wishlist={wishlist}
+            setWishlist={setWishlist}
           />
         )}
-
-        {activeTab === 'checkout' && selectedProduct && (
-          <Checkout
-            product={selectedProduct}
-            currency={currency}
-            balance={balance}
-            setBalance={setBalance}
-            user={user}
-            setOpenAuthModal={setOpenAuthModal}
-            orders={orders}
-            setOrders={setOrders}
-            setActiveTab={setActiveTab}
-            setActiveInvoice={setActiveInvoice}
-          />
-        )}
-
         {activeTab === 'wallet' && (
           <Wallet
             currency={currency}
             balance={balance}
             onAddFunds={onAddFunds}
+            prefilledAmount={selectedProduct ? Math.ceil(selectedProduct.priceINR) : null}
           />
         )}
 
@@ -248,12 +468,68 @@ export default function App() {
             orders={orders}
             currency={currency}
             onViewInvoice={setActiveInvoice}
+            user={user}
+            setOrders={setOrders}
+          />
+        )}
+
+        {activeTab === 'about' && (
+          <About />
+        )}
+
+        {activeTab === 'contact' && (
+          <Contact user={user} />
+        )}
+
+        {activeTab === 'cart' && (
+          <CartPage
+            cart={cart}
+            setCart={setCart}
+            currency={currency}
+            user={user}
+            setOpenAuthModal={setOpenAuthModal}
+            setActiveTab={setActiveTab}
+            setSelectedProduct={setSelectedProduct}
+          />
+        )}
+
+        {activeTab === 'dashboard' && (
+          <Dashboard
+            user={user}
+            setUser={setUser}
+            currency={currency}
+            balance={balance}
+            orders={orders}
+            services={services}
+            setActiveTab={setActiveTab}
+            wishlist={wishlist}
+            setWishlist={setWishlist}
+            usersList={usersList}
+            onAdminAddFunds={onAdminAddFunds}
+          />
+        )}
+
+        {activeTab === 'statement' && (
+          <Statement
+            orders={orders}
+            balance={balance}
+            currency={currency}
           />
         )}
       </main>
 
       {/* Footer layout */}
-      <Footer currency={currency} />
+      <Footer
+        currency={currency}
+        clients={clients}
+        user={user}
+        onClientsUpdate={async () => {
+          try {
+            const res = await fetch('https://gsmgiri-website-backend.onrender.com/api/clients');
+            if (res.ok) setClients(await res.json());
+          } catch (e) { console.error('Failed to refresh clients:', e); }
+        }}
+      />
 
       {/* General Interactive Modals */}
       <Modals

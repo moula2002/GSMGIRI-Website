@@ -13,11 +13,18 @@ const generateServiceCode = (orderId) => {
   };
 };
 
-export default function History({ orders, currency, onViewInvoice }) {
+export default function History({ orders, currency, onViewInvoice, user, setOrders }) {
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
   const [viewCodeOrder, setViewCodeOrder] = useState(null);
   const [codeCopied, setCodeCopied] = useState(null);
+  const formatPrice = (priceINR) => {
+    if (currency === 'INR') {
+      return `₹${(priceINR || 0).toLocaleString('en-IN')}`;
+    }
+    const converted = Math.round((priceINR || 0) / 83);
+    return `$${converted.toLocaleString('en-US')}`;
+  };
 
   const handleCopy = (text, key) => {
     navigator.clipboard.writeText(text).catch(() => {});
@@ -25,39 +32,80 @@ export default function History({ orders, currency, onViewInvoice }) {
     setTimeout(() => setCodeCopied(null), 2000);
   };
 
-  const formatPrice = (priceINR) => {
-    if (currency === 'INR') {
-      return `₹${priceINR.toLocaleString('en-IN')}`;
+  const handleStatusChange = async (orderId, newStatus) => {
+    try {
+      const response = await fetch(`https://gsmgiri-website-backend.onrender.com/api/admin/orders/${orderId}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status: newStatus })
+      });
+      if (response.ok) {
+        const data = await response.json();
+        // Refresh local orders state
+        if (setOrders) {
+          setOrders(prev => prev.map(o => o.id === orderId ? { ...o, status: newStatus } : o));
+        }
+      } else {
+        alert('Failed to update order status');
+      }
+    } catch (err) {
+      console.error(err);
+      alert('Error updating order status');
     }
-    const converted = Math.round(priceINR / 83);
-    return `$${converted.toLocaleString('en-US')}`;
+  };
+
+  const handlePaymentStatusChange = async (orderId, newPayStatus) => {
+    try {
+      const response = await fetch(`https://gsmgiri-website-backend.onrender.com/api/admin/orders/${orderId}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ paymentStatus: newPayStatus })
+      });
+      if (response.ok) {
+        const data = await response.json();
+        if (setOrders) {
+          setOrders(prev => prev.map(o => o.id === orderId ? { ...o, paymentStatus: newPayStatus } : o));
+        }
+      } else {
+        alert('Failed to update payment status');
+      }
+    } catch (err) {
+      console.error(err);
+      alert('Error updating payment status');
+    }
   };
 
   const getStatusBadge = (status) => {
     switch (status) {
       case 'Confirmed':
       case 'Completed':
+      case 'Delivered':
         return (
           <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-600 border border-emerald-200">
-            ● Confirmed
+            ● {status}
           </span>
         );
       case 'Processing':
       case 'Pending':
+      case 'Shipped':
         return (
           <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-amber-50 text-amber-600 border border-amber-200 animate-pulse">
-            ● Processing
+            ● {status}
           </span>
         );
       case 'Cancelled':
       case 'Refunded':
         return (
           <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-rose-50 text-rose-600 border border-rose-200">
-            ● Refunded
+            ● {status}
           </span>
         );
       default:
-        return null;
+        return (
+          <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-slate-50 text-slate-650 border border-slate-200">
+            ● {status}
+          </span>
+        );
     }
   };
 
@@ -70,19 +118,21 @@ export default function History({ orders, currency, onViewInvoice }) {
 
     const matchesStatus =
       statusFilter === 'all' ||
-      (statusFilter === 'confirmed' && (order.status === 'Confirmed' || order.status === 'Completed')) ||
-      (statusFilter === 'processing' && order.status === 'Processing') ||
-      (statusFilter === 'refunded' && order.status === 'Refunded');
+      (statusFilter === 'confirmed' && (order.status === 'Confirmed' || order.status === 'Completed' || order.status === 'Delivered')) ||
+      (statusFilter === 'processing' && (order.status === 'Processing' || order.status === 'Pending' || order.status === 'Shipped')) ||
+      (statusFilter === 'refunded' && (order.status === 'Refunded' || order.status === 'Cancelled'));
 
     return matchesSearch && matchesStatus;
   });
+
+  const isAdmin = user && user.role === 'admin';
 
   return (
     <section className="max-w-7xl mx-auto px-4 py-8">
       {/* Section Title */}
       <div className="flex items-center gap-2 mb-8 border-l-4 border-[#d4af37] pl-3">
         <h1 className="text-2xl font-bold tracking-tight text-slate-800 uppercase">
-          Agent Order &amp; Transaction Logs
+          {isAdmin ? 'Admin Orders & Logs Management' : 'Agent Order & Transaction Logs'}
         </h1>
       </div>
 
@@ -103,9 +153,9 @@ export default function History({ orders, currency, onViewInvoice }) {
         <div className="flex items-center gap-2 w-full md:w-auto overflow-x-auto scrollbar-none">
           {[
             { id: 'all', label: 'All Statuses' },
-            { id: 'confirmed', label: 'Confirmed' },
-            { id: 'processing', label: 'Processing' },
-            { id: 'refunded', label: 'Refunded' }
+            { id: 'confirmed', label: 'Completed' },
+            { id: 'processing', label: 'Active/Pending' },
+            { id: 'refunded', label: 'Cancelled/Refunded' }
           ].map((status) => (
             <button
               key={status.id}
@@ -128,7 +178,7 @@ export default function History({ orders, currency, onViewInvoice }) {
           <div className="text-center py-16 text-slate-400">
             <ClockIcon className="w-12 h-12 text-slate-200 mx-auto mb-3" />
             <h3 className="text-base font-bold text-slate-700">No Orders Match</h3>
-            <p className="text-xs text-slate-400 mt-1">Try clearing filters or search terms.</p>
+            <p className="text-xs text-slate-450 mt-1">Try clearing filters or search terms.</p>
           </div>
         ) : (
           <div className="overflow-x-auto">
@@ -137,9 +187,12 @@ export default function History({ orders, currency, onViewInvoice }) {
                 <tr className="bg-slate-50 text-slate-550 text-[10px] uppercase font-bold tracking-widest border-b border-slate-200">
                   <th className="py-4 px-6">Order ID</th>
                   <th className="py-4 px-6">Service/Details</th>
-                  <th className="py-4 px-6">Client Info</th>
+                  <th className="py-4 px-6">Customer Info</th>
                   <th className="py-4 px-6">Date / Time</th>
-                  <th className="py-4 px-6 text-right">Debit Cost</th>
+                  <th className="py-4 px-6 text-center">Qty</th>
+                  <th className="py-4 px-6 text-right">Rate</th>
+                  <th className="py-4 px-6 text-right">Total</th>
+                  <th className="py-4 px-6 text-center">Payment</th>
                   <th className="py-4 px-6 text-center">Status</th>
                   <th className="py-4 px-6 text-center">Actions</th>
                 </tr>
@@ -167,7 +220,7 @@ export default function History({ orders, currency, onViewInvoice }) {
                       </span>
                     </td>
 
-                    {/* Client Info */}
+                    {/* Customer Info */}
                     <td className="py-4 px-6">
                       <span className="font-bold text-slate-700 block">{order.client || 'SaaS System'}</span>
                       <span className="text-[10px] text-slate-450">{order.clientContact || 'Direct Agent Pool'}</span>
@@ -179,14 +232,72 @@ export default function History({ orders, currency, onViewInvoice }) {
                       <div className="text-[10px] text-slate-450">{order.time}</div>
                     </td>
 
-                    {/* Price */}
-                    <td className="py-4 px-6 text-right font-extrabold text-[#d4af37] whitespace-nowrap">
+                    {/* Quantity */}
+                    <td className="py-4 px-6 text-center font-bold text-slate-700">
+                      {order.quantity || 1}
+                    </td>
+
+                    {/* Rate */}
+                    <td className="py-4 px-6 text-right font-semibold text-slate-600 whitespace-nowrap">
                       {formatPrice(order.priceINR)}
+                    </td>
+
+                    {/* Total Price */}
+                    <td className="py-4 px-6 text-right font-extrabold text-[#d4af37] whitespace-nowrap">
+                      {formatPrice(order.totalAmount || (order.priceINR * (order.quantity || 1)))}
+                    </td>
+
+                    {/* Payment Status */}
+                    <td className="py-4 px-6 text-center whitespace-nowrap">
+                      {isAdmin ? (
+                        <div className="flex flex-col gap-1 items-center">
+                          <select
+                            value={order.paymentStatus || 'Paid'}
+                            onChange={(e) => handlePaymentStatusChange(order.id, e.target.value)}
+                            className="bg-slate-50 border border-slate-200 rounded px-1.5 py-1 text-[10px] font-bold text-slate-750 focus:outline-none focus:border-[#d4af37] cursor-pointer"
+                          >
+                            <option value="Paid">Paid</option>
+                            <option value="Unpaid">Unpaid</option>
+                            <option value="Refunded">Refunded</option>
+                          </select>
+                          <span className="text-[9px] font-extrabold uppercase text-slate-400">
+                            {order.paymentMethod || 'Wallet'}
+                          </span>
+                        </div>
+                      ) : (
+                        <div className="flex flex-col gap-1 items-center">
+                          <span className={`inline-flex px-2 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider ${
+                            (order.paymentStatus || 'Paid') === 'Paid'
+                              ? 'bg-emerald-50 text-emerald-700 border border-emerald-150'
+                              : 'bg-rose-50 text-rose-700 border border-rose-150'
+                          }`}>
+                            {order.paymentStatus || 'Paid'}
+                          </span>
+                          <span className="text-[9px] font-extrabold uppercase text-slate-400">
+                            {order.paymentMethod || 'Wallet'}
+                          </span>
+                        </div>
+                      )}
                     </td>
 
                     {/* Status */}
                     <td className="py-4 px-6 text-center whitespace-nowrap">
-                      {getStatusBadge(order.status)}
+                      {isAdmin ? (
+                        <select
+                          value={order.status}
+                          onChange={(e) => handleStatusChange(order.id, e.target.value)}
+                          className="bg-slate-50 border border-slate-200 rounded px-1.5 py-1 text-[10px] font-bold text-slate-750 focus:outline-none focus:border-[#d4af37] cursor-pointer"
+                        >
+                          <option value="Pending">Pending</option>
+                          <option value="Processing">Processing</option>
+                          <option value="Shipped">Shipped</option>
+                          <option value="Delivered">Delivered</option>
+                          <option value="Cancelled">Cancelled</option>
+                          <option value="Completed">Completed</option>
+                        </select>
+                      ) : (
+                        getStatusBadge(order.status)
+                      )}
                     </td>
 
                     {/* Actions: Invoice + View Code */}

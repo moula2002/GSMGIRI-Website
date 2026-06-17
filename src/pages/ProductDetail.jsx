@@ -1,15 +1,19 @@
 import React, { useState, useEffect } from 'react';
 import { GlobeIcon, KeyIcon } from '../components/Icons';
-import { SERVICES_DATA } from './Services';
-
 export default function ProductDetail({
   product,
+  services = [],
   setProduct,
   currency,
   user,
   setOpenAuthModal,
   onBookService,
-  setActiveTab
+  setActiveTab,
+  backTab = 'services',
+  cart = [],
+  setCart,
+  wishlist = [],
+  setWishlist
 }) {
   const [agreed, setAgreed] = useState(true);
 
@@ -27,8 +31,46 @@ export default function ProductDetail({
     return `$${converted.toLocaleString('en-US')}`;
   };
 
+  const handleAddToCart = () => {
+    const exists = cart.find(item => item.id === product.id);
+    let updated;
+    if (exists) {
+      updated = cart.map(item => {
+        if (item.id === product.id) {
+          return { ...item, quantity: item.quantity + 1 };
+        }
+        return item;
+      });
+    } else {
+      updated = [...cart, { ...product, quantity: 1 }];
+    }
+    setCart(updated);
+    localStorage.setItem('gsm_cart', JSON.stringify(updated));
+    alert('Added to cart successfully!');
+  };
+
+  const handleToggleWishlist = () => {
+    let updated;
+    if (wishlist.includes(product.id)) {
+      updated = wishlist.filter(id => id !== product.id);
+    } else {
+      updated = [...wishlist, product.id];
+    }
+    setWishlist(updated);
+    localStorage.setItem('gsm_wishlist', JSON.stringify(updated));
+  };
+
   // Helper to render custom visual badge thumbnails
   const getServiceThumbnail = (svc) => {
+    if (svc.image) {
+      return (
+        <img 
+          src={svc.image} 
+          alt={svc.title} 
+          className="w-14 h-14 object-cover rounded-xl shrink-0 border border-slate-200"
+        />
+      );
+    }
     const t = svc.thumbType || 'default';
     if (t === 'rent') {
       return (
@@ -102,11 +144,9 @@ export default function ProductDetail({
 
   // Find related services of same category
   const getRelatedServices = () => {
-    const allList = [...SERVICES_DATA.bestSelling, ...SERVICES_DATA.recentAdded];
-    // Filter by same category, exclude current product
-    return allList
+    return services
       .filter((item) => item.category === product.category && item.id !== product.id)
-      .slice(0, 4); // Take 4 items
+      .slice(0, 4);
   };
 
   const relatedItems = getRelatedServices();
@@ -119,7 +159,7 @@ export default function ProductDetail({
     <section className="max-w-7xl mx-auto px-4 py-8 relative font-sans text-left">
       {/* Back Button */}
       <button
-        onClick={() => setActiveTab('services')}
+        onClick={() => setActiveTab(backTab)}
         className="mb-4 flex items-center gap-2 text-xs font-black text-slate-600 hover:text-[#d4af37] transition-colors group cursor-pointer"
       >
         <span className="w-7 h-7 rounded-lg bg-white border border-slate-200 group-hover:border-[#d4af37]/50 flex items-center justify-center shadow-sm transition-all group-hover:bg-amber-50/20">
@@ -189,6 +229,19 @@ export default function ProductDetail({
             </div>
           </div>
 
+          {/* Detailed Product Description & Instructions */}
+          {product.desc && (
+            <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm space-y-4 text-left">
+              <div className="border-b border-slate-100 pb-2 flex items-center gap-2">
+                <div className="w-1.5 h-4 bg-[#d4af37] rounded-sm"></div>
+                <h3 className="text-xs font-black text-slate-800 uppercase tracking-widest">Service Details & Instructions</h3>
+              </div>
+              <div className="text-xs text-slate-600 leading-relaxed font-sans whitespace-pre-wrap">
+                {product.desc}
+              </div>
+            </div>
+          )}
+
           {/* Terms & Actions */}
           <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm space-y-4">
             <label className="flex items-center gap-2.5 text-xs font-semibold text-slate-600 select-none cursor-pointer">
@@ -203,17 +256,19 @@ export default function ProductDetail({
               </span>
             </label>
 
-            <button
-              onClick={handlePlaceOrder}
-              disabled={!agreed}
-              className={`w-full font-black py-3.5 rounded-xl text-xs uppercase tracking-wider transition-all shadow flex items-center justify-center gap-2 cursor-pointer border ${
-                agreed
-                  ? 'bg-[#d4af37] hover:bg-[#c5a059] text-slate-950 border-[#d4af37]/35 hover:shadow-md'
-                  : 'bg-slate-100 text-slate-400 border-slate-200 cursor-not-allowed shadow-none'
-              }`}
-            >
-              Place an order
-            </button>
+            <div className="flex gap-4">
+              <button
+                onClick={handlePlaceOrder}
+                disabled={!agreed}
+                className={`flex-1 font-black py-3.5 rounded-xl text-xs uppercase tracking-wider transition-all shadow flex items-center justify-center gap-2 cursor-pointer border ${
+                  agreed
+                    ? 'bg-[#008080] hover:bg-[#006666] text-white border-[#008080]/35 hover:shadow-md'
+                    : 'bg-slate-100 text-slate-400 border-slate-200 cursor-not-allowed shadow-none'
+                }`}
+              >
+                PLACE AN ORDER
+              </button>
+            </div>
           </div>
 
         </div>

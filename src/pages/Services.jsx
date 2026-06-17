@@ -1,401 +1,60 @@
 import React, { useState } from 'react';
 import { GlobeIcon, KeyIcon } from '../components/Icons';
-import b2bTravelBanner from '../assets/b2b_travel_api_banner.png';
-import b2bHotelBanner from '../assets/b2b_hotel_api_banner.png';
-import b2bFlightsBanner from '../assets/b2b_flights_api_banner.png';
+import bannerGsmGiri from '../assets/banner_gsmgiri.png';
+import bannerNexaPro from '../assets/banner_nexapro_tool.png';
+import bannerOctoplus from '../assets/banner_octoplus.png';
 
-// 3-Column Top Promo Grid Data
-const PROMO_COLUMNS = [
+// 3-Column Top Promo Grid Headers Configuration
+const PROMO_HEADERS = [
   {
     title: "NOW UNLOCKING TOOLS RENT AVAILABLE!",
-    banner: b2bTravelBanner,
-    items: [
-      {
-        id: 'promo_r1',
-        title: 'UnlockTool 6 Hours ➕ Fast (24x7)',
-        category: 'leases',
-        type: 'Rental Key',
-        priceINR: 150,
-        processing: '1 INSTANT',
-        isInstant: true,
-        thumbType: 'rent'
-      },
-      {
-        id: 'promo_r2',
-        title: 'Android Multi Tool - 2 Hours ➕ Fast (24x7)',
-        category: 'leases',
-        type: 'Rental Key',
-        priceINR: 100,
-        processing: 'INSTANT',
-        isInstant: true,
-        thumbType: 'rent'
-      },
-      {
-        id: 'promo_r3',
-        title: 'Tsm Pro Tool 3 Hours ➕ Fast (24x7)',
-        category: 'leases',
-        type: 'Rental Key',
-        priceINR: 80,
-        processing: 'INSTANT',
-        isInstant: true,
-        thumbType: 'rent'
-      }
-    ]
+    banner: bannerGsmGiri
   },
   {
     title: "UNLOCK TOOL SOFTWARE LICENSE PACKAGE ACTIVATION",
-    banner: b2bHotelBanner,
-    items: [
-      {
-        id: 'promo_a1',
-        title: 'UnlockTool 3 months License Activate/Renew',
-        category: 'packages',
-        type: 'License Activation',
-        priceINR: 1850,
-        processing: '1-60 MINIUTES',
-        isInstant: false,
-        thumbType: 'unlocktool'
-      },
-      {
-        id: 'promo_a2',
-        title: 'UnlockTool 6 months License Activate/Renew',
-        category: 'packages',
-        type: 'License Activation',
-        priceINR: 2950,
-        processing: '1-60 MINIUTES',
-        isInstant: false,
-        thumbType: 'unlocktool'
-      },
-      {
-        id: 'promo_a3',
-        title: 'UnlockTool 12 months License Activate/Renew',
-        category: 'packages',
-        type: 'License Activation',
-        priceINR: 4450,
-        processing: '1-60 MINIUTES',
-        isInstant: false,
-        thumbType: 'unlocktool'
-      }
-    ]
+    banner: bannerNexaPro
   },
   {
     title: "ALL ACTIVATION CREDITS & INSTANT SERVICES AVAILABLE",
-    banner: b2bFlightsBanner,
-    items: [
-      {
-        id: 'promo_c1',
-        title: 'Android Multi Tool - 1 Year Activation(AMT)',
-        category: 'credits',
-        type: 'Software Activation',
-        priceINR: 2450,
-        processing: 'MINIUTES',
-        isInstant: true,
-        thumbType: 'amt'
-      },
-      {
-        id: 'promo_c2',
-        title: 'NexaPro Xiaomi Frp Tool ! FDL / FRP ] Any Quantity',
-        category: 'credits',
-        type: 'FRP Credit',
-        priceINR: 180,
-        processing: '1-5 MINUTES',
-        isInstant: true,
-        thumbType: 'nexapro'
-      },
-      {
-        id: 'promo_c3',
-        title: 'GS Realme Auth Tool Otp 1 Click',
-        category: 'credits',
-        type: 'Auth Credit',
-        priceINR: 220,
-        processing: '1-10 MINUTES',
-        isInstant: true,
-        thumbType: 'gsrealme'
-      }
-    ]
+    banner: bannerOctoplus
   }
 ];
 
-export const SERVICES_DATA = {
-  bestSelling: [
-    {
-      id: 'bs1',
-      title: 'UnlockTool 6 Hours ➕ Fast (24x7)',
-      category: 'leases',
-      type: 'Rental Key',
-      priceINR: 150,
-      processing: '1 INSTANT',
-      isInstant: true,
-      thumbType: 'rent',
-      desc: '6 Hours full access to UnlockTool rent console. High success rate, instant activation.'
-    },
-    {
-      id: 'bs2',
-      title: 'Android Multi Tool - 2 Hours ➕ Fast (24x7)',
-      category: 'leases',
-      type: 'Rental Key',
-      priceINR: 100,
-      processing: 'INSTANT',
-      isInstant: true,
-      thumbType: 'rent',
-      desc: '2 Hours rental license key for Android Multi Tool. Instant credentials delivery.'
-    },
-    {
-      id: 'bs3',
-      title: 'Galaxy Auth GRT (Realme OTP) 1 Device',
-      category: 'credits',
-      type: 'Auth Service',
-      priceINR: 120,
-      processing: 'INSTANT INSTANT',
-      isInstant: true,
-      thumbType: 'galaxy',
-      desc: 'Realme OTP authentication voucher code for 1 device unlock. Automated API delivery.'
-    },
-    {
-      id: 'bs4',
-      title: 'Tsm Pro Tool 3 Hours ➕ Fast (24x7)',
-      category: 'leases',
-      type: 'Rental Key',
-      priceINR: 80,
-      processing: 'INSTANT',
-      isInstant: true,
-      thumbType: 'rent',
-      desc: '3 Hours rent token key for Tsm Pro Tool. Safe and automated system release.'
-    },
-    {
-      id: 'bs5',
-      title: 'Ghost Auth Tool [ Auth Flash / EFS / Mi Cloud / FDL / FRP ] Any Quantity...',
-      category: 'credits',
-      type: 'Auth Credit',
-      priceINR: 190,
-      processing: 'MINIUTES',
-      isInstant: true,
-      thumbType: 'default',
-      desc: 'Ghost Auth Tool instant balance credit for Xiaomi auth flash, EFS reset, and bypass.'
-    },
-    {
-      id: 'bs6',
-      title: 'HQ AUTH REALME OTP ALL CPU [ NO NEED IMEI ]',
-      category: 'credits',
-      type: 'Auth Credit',
-      priceINR: 250,
-      processing: '1-10 MINUTES',
-      isInstant: true,
-      thumbType: 'gsrealme',
-      desc: 'High-quality Realme OTP authentication bypass. Supporting all CPU chipsets.'
-    },
-    {
-      id: 'bs7',
-      title: 'NexaPro Xiaomi Frp Tool ! FDL / FRP ] Any Quantity [Existing...',
-      category: 'credits',
-      type: 'FRP Credit',
-      priceINR: 180,
-      processing: '1-5 MINUTES',
-      isInstant: true,
-      thumbType: 'nexapro',
-      desc: 'Xiaomi custom FRP bypass credit pools. Instant API verification.'
-    },
-    {
-      id: 'bs8',
-      title: 'iRemoval PRO Charity Edition FREE API - iRemoval Pro A12+ FREE Edition...',
-      category: 'credits',
-      type: 'API Bypass',
-      priceINR: 0,
-      processing: 'MINIUTES',
-      isInstant: true,
-      thumbType: 'default',
-      desc: 'iRemoval PRO free public utility token for A12+ iOS iCloud activation lock check.'
-    },
-    {
-      id: 'bs9',
-      title: 'FCK Tool Xiaomi FRP ( Exist User )No refund any issue ❌ ➕ Fast',
-      category: 'credits',
-      type: 'FRP Credit',
-      priceINR: 110,
-      processing: '10 MINIUTES',
-      isInstant: true,
-      thumbType: 'default',
-      desc: 'Xiaomi FRP lock removal credit pools for existing active users.'
-    },
-    {
-      id: 'bs10',
-      title: 'NexaPro A12+ Hello bypass',
-      category: 'packages',
-      type: 'API Bypass',
-      priceINR: 1500,
-      processing: '1-2 MINUTES',
-      isInstant: true,
-      thumbType: 'nexapro',
-      desc: 'NexaPro iOS 15/16/17 Hello screen activation bypass credit token.'
-    },
-    {
-      id: 'bs11',
-      title: 'Phoenix Service Tool [ SAMSUNG + Nokia HMD TOOL ] (FLASH - FRP - ...',
-      category: 'packages',
-      type: 'Software Key',
-      priceINR: 2800,
-      processing: '1-3 MINIUTES',
-      isInstant: true,
-      thumbType: 'samsung',
-      desc: 'Phoenix service tool credits for official firmware flashing and Samsung FRP resets.'
-    },
-    {
-      id: 'bs12',
-      title: 'MR_AUTH_Tool | Xiaomi EDL | FRP',
-      category: 'credits',
-      type: 'Auth Service',
-      priceINR: 220,
-      processing: 'MINIUTES',
-      isInstant: true,
-      thumbType: 'default',
-      desc: 'Xiaomi EDL authorized authentication credit package for flashing locked devices.'
-    }
-  ],
-  recentAdded: [
-    {
-      id: 'ra1',
-      title: 'MDM FIX TOOL RENT [ 6 Hours ]',
-      category: 'leases',
-      type: 'Rental Key',
-      priceINR: 300,
-      processing: 'INSTANT',
-      isInstant: true,
-      thumbType: 'rent',
-      desc: '6 Hours full access lease to MDM Fix Tool console. Automated credentials delivery.'
-    },
-    {
-      id: 'ra2',
-      title: 'Galaxy Multi Tool 20 Credit Pack',
-      category: 'credits',
-      type: 'Credit Pack',
-      priceINR: 1800,
-      processing: 'INSTANT MINIUTES',
-      isInstant: true,
-      thumbType: 'galaxy',
-      desc: '20 Credits package for Galaxy Multi Tool. Supporting Samsung unlock features.'
-    },
-    {
-      id: 'ra3',
-      title: 'Galaxy Multi Tool - 6 Months Auto Api',
-      category: 'packages',
-      type: 'API License',
-      priceINR: 3500,
-      processing: 'INSTANT',
-      isInstant: true,
-      thumbType: 'galaxy',
-      desc: '6 Months access API license key for Galaxy Multi Tool server pool.'
-    },
-    {
-      id: 'ra4',
-      title: 'Galaxy Multi Tool - 1 Year Auto Api',
-      category: 'packages',
-      type: 'API License',
-      priceINR: 6500,
-      processing: 'INSTANT MINIUTES',
-      isInstant: true,
-      thumbType: 'galaxy',
-      desc: '12 Months access API license key for Galaxy Multi Tool server pool.'
-    },
-    {
-      id: 'ra5',
-      title: 'Galaxy Multi Tool - 1 Months Auto Api',
-      category: 'packages',
-      type: 'API License',
-      priceINR: 950,
-      processing: 'INSTANT',
-      isInstant: true,
-      thumbType: 'galaxy',
-      desc: '30 Days access API license key for Galaxy Multi Tool server pool.'
-    },
-    {
-      id: 'ra6',
-      title: 'Samsung FRP Worldwide - IMEI/SN Service (VIP Level)',
-      category: 'credits',
-      type: 'IMEI Service',
-      priceINR: 1200,
-      processing: 'MINIUTES',
-      isInstant: true,
-      thumbType: 'samsung',
-      desc: 'VIP Samsung factory FRP lock check and removal via device IMEI/Serial number.'
-    },
-    {
-      id: 'ra7',
-      title: 'Samsung FRP Worldwide - IMEI/SN Service ( Super Level )',
-      category: 'credits',
-      type: 'IMEI Service',
-      priceINR: 850,
-      processing: '1-15 MINIUTES',
-      isInstant: true,
-      thumbType: 'samsung',
-      desc: 'Standard Samsung factory FRP lock check and removal via device IMEI/Serial number.'
-    },
-    {
-      id: 'ra8',
-      title: 'UK-TOOLS Realme (O+ Support) Realme Token',
-      category: 'credits',
-      type: 'Auth Token',
-      priceINR: 240,
-      processing: 'MINIUTES',
-      isInstant: true,
-      thumbType: 'default',
-      desc: 'Realme Oppo server authentication token. Direct automated API connection.'
-    },
-    {
-      id: 'ra9',
-      title: 'GALAXY ONEPLUS AUTH FLASH OTP (Galaxy-Realme.Com)',
-      category: 'credits',
-      type: 'Auth Flash',
-      priceINR: 300,
-      processing: 'INSTANT MINIUTES',
-      isInstant: true,
-      thumbType: 'galaxy',
-      desc: 'OnePlus network auth flash OTP credits. Automated server validation.'
-    },
-    {
-      id: 'ra10',
-      title: 'JUDE AIO ACTIVATOR A5 TO A19 ICLOUD BYPASS NO NEED JAILBREAK',
-      category: 'credits',
-      type: 'iCloud Bypass',
-      priceINR: 1450,
-      processing: '1-5 MINUTES',
-      isInstant: true,
-      thumbType: 'default',
-      desc: 'Jude AIO bypass credentials for iOS A5 to A19 devices. No jailbreak required.'
-    },
-    {
-      id: 'ra11',
-      title: 'INFINIX - TECNO - ITEL ID Removal - Official Service { 1 -...',
-      category: 'credits',
-      type: 'ID Removal',
-      priceINR: 900,
-      processing: '1-6 HOURS',
-      isInstant: false,
-      thumbType: 'default',
-      desc: 'Official database ID removal service for Infinix, Tecno, and Itel account locks.'
-    },
-    {
-      id: 'ra12',
-      title: 'Rapid Flash Tool Auth Tool Credit Any Qty (AUTH, FRP, FASTBOOT TO...',
-      category: 'credits',
-      type: 'Auth Credit',
-      priceINR: 130,
-      processing: 'MINIUTES',
-      isInstant: true,
-      thumbType: 'default',
-      desc: 'Rapid Flash Tool account credits. Supported for EDL auth flash and fastboot tools.'
-    }
-  ]
-};
-
-export default function Services({ searchQuery, currency, onBookService }) {
-  const [activeCategory, setActiveCategory] = useState('all');
-
-  const categories = [
+export default function Services({
+  services = [],
+  searchQuery,
+  promoColumns: dbPromoColumns = [],
+  currency,
+  onBookService,
+  categories: dbCategories = [],
+  activeCategory = 'all',
+  setActiveCategory
+}) {
+  const uniqueCategories = Array.from(new Set((services || []).map(s => s.category).filter(Boolean)));
+  const categoryLabels = {
+    leases: 'B2B Rent Tools',
+    packages: 'License Activations',
+    credits: 'Credits Pack',
+    server: 'Server Services',
+    remote: 'Remote Service / Tool-Rent',
+    file: 'File Service',
+    group: 'Service By Group'
+  };
+  const categoriesList = [
     { id: 'all', label: 'All Services' },
-    { id: 'leases', label: 'B2B Rent Tools' },
-    { id: 'packages', label: 'License Activations' },
-    { id: 'credits', label: 'Credits Pack' }
+    ...dbCategories.map(cat => ({
+      id: cat.slug,
+      label: cat.name
+    }))
   ];
+
+  // Append any category from active services not present in the DB categories list
+  uniqueCategories.forEach(slug => {
+    if (!categoriesList.some(c => c.id === slug)) {
+      const label = categoryLabels[slug] || (slug.charAt(0).toUpperCase() + slug.slice(1));
+      categoriesList.push({ id: slug, label });
+    }
+  });
 
   // Helper to convert prices
   const getConvertedPrice = (priceINR) => {
@@ -408,6 +67,15 @@ export default function Services({ searchQuery, currency, onBookService }) {
 
   // Custom visual badge thumbnails
   const getServiceThumbnail = (svc) => {
+    if (svc.image) {
+      return (
+        <img 
+          src={svc.image} 
+          alt={svc.title} 
+          className="w-14 h-14 object-cover rounded-xl shrink-0 border border-slate-200"
+        />
+      );
+    }
     const t = svc.thumbType || 'default';
     if (t === 'rent') {
       return (
@@ -482,18 +150,50 @@ export default function Services({ searchQuery, currency, onBookService }) {
   // Filtering Logic
   const filterService = (service) => {
     const matchesCategory = activeCategory === 'all' || service.category === activeCategory;
-    const matchesSearch = searchQuery === '' || 
-      service.title.toLowerCase().includes(searchQuery.toLowerCase()) || 
+    const matchesSearch = searchQuery === '' ||
+      service.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
       (service.desc && service.desc.toLowerCase().includes(searchQuery.toLowerCase())) ||
       service.type.toLowerCase().includes(searchQuery.toLowerCase());
     return matchesCategory && matchesSearch;
   };
 
-  const filteredBestSelling = SERVICES_DATA.bestSelling.filter(filterService);
-  const filteredRecentAdded = SERVICES_DATA.recentAdded.filter(filterService);
+  const bestSelling = (services || []).filter(s => s.isBestSelling === true);
+  const recentAdded = [...(services || [])]
+    .sort((a, b) => {
+      if (a.isRecentlyAdded && !b.isRecentlyAdded) return -1;
+      if (!a.isRecentlyAdded && b.isRecentlyAdded) return 1;
+      const dateA = a.createdAt ? new Date(a.createdAt) : (a.id && a.id.startsWith('svc-') ? new Date(Number(a.id.replace('svc-', ''))) : new Date(0));
+      const dateB = b.createdAt ? new Date(b.createdAt) : (b.id && b.id.startsWith('svc-') ? new Date(Number(b.id.replace('svc-', ''))) : new Date(0));
+      return dateB - dateA;
+    })
+    .slice(0, 12);
+  const otherServices = (services || []).filter(s => !s.isBestSelling && !recentAdded.some(ra => ra.id === s.id) && s.section !== 'promo');
 
-  const renderServiceGrid = (services, title) => {
-    if (services.length === 0) return null;
+  const defaultBanners = [bannerGsmGiri, bannerNexaPro, bannerOctoplus];
+  const defaultTitles = [
+    "NOW UNLOCKING TOOLS RENT AVAILABLE!",
+    "UNLOCK TOOL SOFTWARE LICENSE PACKAGE ACTIVATION",
+    "ALL ACTIVATION CREDITS & INSTANT SERVICES AVAILABLE"
+  ];
+
+  const promoColumns = [0, 1, 2].map((colIdx) => {
+    const dbCol = (dbPromoColumns || []).find(c => c.columnIndex === colIdx);
+    const title = dbCol ? dbCol.title : defaultTitles[colIdx];
+    const banner = dbCol && dbCol.banner && (dbCol.banner.startsWith('data:') || dbCol.banner.startsWith('http') || dbCol.banner.startsWith('/media/')) ? dbCol.banner : defaultBanners[colIdx];
+    const items = (services || []).filter(s => s.section === 'promo' && s.promoColumnIndex === colIdx);
+    return {
+      title,
+      banner,
+      items
+    };
+  });
+
+  const filteredBestSelling = bestSelling.filter(filterService);
+  const filteredRecentAdded = recentAdded.filter(filterService);
+  const filteredOtherServices = otherServices.filter(filterService);
+
+  const renderServiceGrid = (servicesList, title) => {
+    if (servicesList.length === 0) return null;
 
     return (
       <div className="mb-12">
@@ -506,7 +206,7 @@ export default function Services({ searchQuery, currency, onBookService }) {
 
         {/* Card Grid - Row/Flex format */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {services.map((svc) => (
+          {servicesList.map((svc) => (
             <div
               key={svc.id}
               className="bg-white border border-slate-200 rounded-xl p-4 hover:border-[#d4af37]/60 hover:shadow-md transition-all duration-300 flex items-start gap-4 group shadow-sm"
@@ -521,7 +221,7 @@ export default function Services({ searchQuery, currency, onBookService }) {
                   <h3 className="text-xs md:text-sm font-bold text-slate-800 group-hover:text-[#d4af37] transition-colors leading-snug truncate-2-lines">
                     {svc.title}
                   </h3>
-                  
+
                   {/* Processing Badge */}
                   <div className="mt-1.5">
                     <span className="inline-block bg-[#fff5eb] text-[#f97316] border border-[#ffedd5] px-2 py-0.5 rounded text-[8px] font-black uppercase tracking-wider">
@@ -556,15 +256,15 @@ export default function Services({ searchQuery, currency, onBookService }) {
 
   return (
     <section className="max-w-7xl mx-auto px-4 py-8 relative font-sans">
-      
+
       {/* Search status or headers */}
       {!searchQuery && (
         <>
           {/* 3-Column Top Promoted Services */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
-            {PROMO_COLUMNS.map((col, idx) => (
+            {promoColumns.map((col, idx) => (
               <div key={idx} className="bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-sm flex flex-col">
-                
+
                 {/* Banner Image */}
                 <div className="h-28 overflow-hidden relative border-b border-slate-150">
                   <img src={col.banner} alt={col.title} className="w-full h-full object-cover" />
@@ -586,7 +286,7 @@ export default function Services({ searchQuery, currency, onBookService }) {
                           </h4>
                           <div className="mt-1">
                             <span className="inline-block bg-[#fff5eb] text-[#f97316] border border-[#ffedd5] px-1.5 py-0.5 rounded text-[8px] font-black uppercase tracking-wider leading-none">
-                              {col.items.indexOf(svc) === 0 ? svc.processing : '1-60 MINIUTES'}
+                              {svc.processing}
                             </span>
                           </div>
                         </div>
@@ -615,15 +315,14 @@ export default function Services({ searchQuery, currency, onBookService }) {
 
       {/* Category Selection Filter Tabs */}
       <div className="flex items-center gap-2 overflow-x-auto pb-4 mb-8 border-b border-slate-200 scrollbar-none">
-        {categories.map((cat) => (
+        {categoriesList.map((cat) => (
           <button
             key={cat.id}
-            onClick={() => setActiveCategory(cat.id)}
-            className={`whitespace-nowrap px-4 py-2 rounded-lg text-xs font-bold uppercase tracking-wider transition-all border ${
-              activeCategory === cat.id
+            onClick={() => setActiveCategory && setActiveCategory(cat.id)}
+            className={`whitespace-nowrap px-4 py-2 rounded-lg text-xs font-bold uppercase tracking-wider transition-all border ${activeCategory === cat.id
                 ? 'bg-[#d4af37] text-slate-950 border-[#d4af37] shadow-sm font-black'
                 : 'bg-white border-slate-200 text-slate-500 hover:text-[#d4af37] hover:border-[#d4af37]/40'
-            }`}
+              }`}
           >
             {cat.label}
           </button>
@@ -631,7 +330,7 @@ export default function Services({ searchQuery, currency, onBookService }) {
       </div>
 
       {/* Services Content Grid */}
-      {filteredBestSelling.length === 0 && filteredRecentAdded.length === 0 ? (
+      {filteredBestSelling.length === 0 && filteredRecentAdded.length === 0 && filteredOtherServices.length === 0 ? (
         <div className="text-center py-12 bg-white rounded-xl border border-slate-200 shadow-sm">
           <GlobeIcon className="w-12 h-12 text-slate-350 mx-auto mb-3" />
           <h3 className="text-base font-bold text-slate-700">No Services Found</h3>
@@ -641,6 +340,7 @@ export default function Services({ searchQuery, currency, onBookService }) {
         <>
           {renderServiceGrid(filteredBestSelling, 'BEST SELLING')}
           {renderServiceGrid(filteredRecentAdded, 'RECENT ADDED')}
+          {renderServiceGrid(filteredOtherServices, 'AVAILABLE SERVICES')}
         </>
       )}
     </section>
