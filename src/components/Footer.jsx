@@ -1,4 +1,5 @@
 import React from 'react';
+import { useLocation, Link } from 'react-router-dom';
 import { WhatsappIcon, TelegramIcon, ShieldIcon, ZapIcon, HeadphonesIcon, WalletIcon } from './Icons';
 
 function ClientCard({ client }) {
@@ -37,13 +38,16 @@ function ClientCard({ client }) {
 }
 
 export default function Footer({ currency, clients = [] }) {
+  const location = useLocation();
   const currentYear = new Date().getFullYear();
+  const isHomePage = location.pathname === '/';
 
   return (
     <footer className="w-full mt-16 text-slate-350 font-sans">
 
       {/* 1. WE ARE OFFICIAL SELLER — Infinite Scrolling Carousel */}
-      <div className="bg-white border-t-2 border-[#d4af37] border-b border-slate-200 overflow-hidden">
+      {isHomePage && (
+        <div className="bg-white border-t-2 border-[#d4af37] border-b border-slate-200 overflow-hidden">
 
         {/* Section Header */}
         <div className="max-w-7xl mx-auto px-4 pt-6 pb-4 flex items-center gap-3">
@@ -84,11 +88,13 @@ export default function Footer({ currency, clients = [] }) {
           </div>
         )}
       </div>
+      )}
 
       {/* Main Footer Wrapper (Navy Background) */}
       <div className="bg-[#0b192c] text-slate-350">
 
         {/* 2. Platform Value Props (Stats Bar equivalent) */}
+        {isHomePage && (
         <div className="bg-[#050b14] py-6 text-white border-b border-slate-900/40">
           <div className="max-w-7xl mx-auto px-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 text-center sm:text-left">
 
@@ -134,9 +140,10 @@ export default function Footer({ currency, clients = [] }) {
 
           </div>
         </div>
+        )}
 
         {/* 3. Main Directories & App Stores */}
-        <div className="max-w-7xl mx-auto px-4 py-12 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-8 text-xs font-medium">
+        <div className="max-w-7xl mx-auto px-4 py-12 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 text-xs font-medium">
 
           {/* Contacts */}
           <div className="space-y-3">
@@ -150,11 +157,11 @@ export default function Footer({ currency, clients = [] }) {
               </li>
               <li className="flex items-center gap-2">
                 <span className="text-[#d4af37] font-bold">☎</span>
-                <a href="tel:+919952620659" className="hover:text-white">+91 9952620659</a>
+                <a href="tel:+916363262006" className="hover:text-white">+91 63632 62006</a>
               </li>
               <li className="flex items-center gap-2">
                 <span className="text-[#d4af37] font-bold">📱</span>
-                <a href="https://wa.me/919952620659" className="hover:text-white">+91 9952620659</a>
+                <a href="https://wa.me/916363262006" className="hover:text-white">+91 63632 62006</a>
               </li>
               <li className="flex items-start gap-2">
                 <span className="text-[#d4af37] font-bold mt-0.5">⏱</span>
@@ -162,7 +169,7 @@ export default function Footer({ currency, clients = [] }) {
               </li>
               <li className="flex items-start gap-2">
                 <span className="text-[#d4af37] font-bold mt-0.5">📍</span>
-                <span>Andhra Pradesh India</span>
+                <span>Bangalore Karnataka</span>
               </li>
             </ul>
           </div>
@@ -173,11 +180,11 @@ export default function Footer({ currency, clients = [] }) {
               COMPANY
             </span>
             <ul className="space-y-2 text-slate-400">
-              <li><span className="hover:text-[#d4af37] cursor-pointer transition-colors">Home</span></li>
-              <li><span className="hover:text-[#d4af37] cursor-pointer transition-colors">About Us</span></li>
-              <li><span className="hover:text-[#d4af37] cursor-pointer transition-colors">Contact Us</span></li>
-              <li><span className="hover:text-[#d4af37] cursor-pointer transition-colors">Reseller Panel</span></li>
-              <li><span className="hover:text-[#d4af37] cursor-pointer transition-colors">Free IMEI Checker</span></li>
+              <li><Link to="/" className="hover:text-[#d4af37] cursor-pointer transition-colors block">Home</Link></li>
+              <li><Link to="/about" className="hover:text-[#d4af37] cursor-pointer transition-colors block">About Us</Link></li>
+              <li><Link to="/contact" className="hover:text-[#d4af37] cursor-pointer transition-colors block">Contact Us</Link></li>
+              <li><Link to="/dashboard" className="hover:text-[#d4af37] cursor-pointer transition-colors block">Reseller Panel</Link></li>
+              <li><Link to="/imei-products" className="hover:text-[#d4af37] cursor-pointer transition-colors block">Free IMEI Checker</Link></li>
             </ul>
           </div>
 
@@ -187,11 +194,11 @@ export default function Footer({ currency, clients = [] }) {
               QUICK ACCESS
             </span>
             <ul className="space-y-2 text-slate-400">
-              <li><span className="hover:text-[#d4af37] cursor-pointer transition-colors">IMEI Service</span></li>
-              <li><span className="hover:text-[#d4af37] cursor-pointer transition-colors">Server Service</span></li>
-              <li><span className="hover:text-[#d4af37] cursor-pointer transition-colors">Remote Service</span></li>
-              <li><span className="hover:text-[#d4af37] cursor-pointer transition-colors">Service by Group</span></li>
-              <li><span className="hover:text-[#d4af37] cursor-pointer transition-colors">Best Selling</span></li>
+              <li><Link to="/imei-products" className="hover:text-[#d4af37] cursor-pointer transition-colors block">IMEI Service</Link></li>
+              <li><Link to="/services" className="hover:text-[#d4af37] cursor-pointer transition-colors block">Server Service</Link></li>
+              <li><Link to="/remote-products" className="hover:text-[#d4af37] cursor-pointer transition-colors block">Remote Service</Link></li>
+              <li><Link to="/category-services" className="hover:text-[#d4af37] cursor-pointer transition-colors block">Service by Group</Link></li>
+              <li><Link to="/services" className="hover:text-[#d4af37] cursor-pointer transition-colors block">Best Selling</Link></li>
             </ul>
           </div>
 
@@ -200,73 +207,24 @@ export default function Footer({ currency, clients = [] }) {
             <span className="block text-[11px] font-bold text-white uppercase tracking-widest">
               LEGAL
             </span>
-            <ul className="space-y-2 text-slate-400">
-              <li><span className="hover:text-[#d4af37] cursor-pointer transition-colors">Privacy Policy</span></li>
-              <li><span className="hover:text-[#d4af37] cursor-pointer transition-colors">Terms of Service</span></li>
-              <li><span className="hover:text-[#d4af37] cursor-pointer transition-colors">Delivery Policy</span></li>
-              <li><span className="hover:text-[#d4af37] cursor-pointer transition-colors">Cancellation Policy</span></li>
-              <li><span className="hover:text-[#d4af37] cursor-pointer transition-colors">Refund & Return Policy</span></li>
+            <ul className="space-y-2 text-slate-400 flex flex-col items-start">
+              <li><Link to="/privacy-policy" className="hover:text-[#d4af37] cursor-pointer transition-colors block">Privacy Policy</Link></li>
+              <li><Link to="/terms-of-service" className="hover:text-[#d4af37] cursor-pointer transition-colors block">Terms of Service</Link></li>
+              <li><Link to="/delivery-policy" className="hover:text-[#d4af37] cursor-pointer transition-colors block">Delivery Policy</Link></li>
+              <li><Link to="/cancellation-policy" className="hover:text-[#d4af37] cursor-pointer transition-colors block">Cancellation Policy</Link></li>
+              <li><Link to="/refund-policy" className="hover:text-[#d4af37] cursor-pointer transition-colors block">Refund & Return Policy</Link></li>
             </ul>
           </div>
 
-          {/* App download buttons */}
-          <div className="space-y-3.5">
-            <span className="block text-[11px] font-bold text-white uppercase tracking-widest">
-              GET THE APP
-            </span>
-            <p className="text-[10px] text-slate-400 leading-relaxed font-light">
-              Order, track & get support from your phone.
-            </p>
-
-            <div className="flex flex-col gap-2">
-              {/* Apple App Store */}
-              <a
-                href="https://apple.co/3..."
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-center gap-2.5 bg-[#070e1b] hover:bg-[#050b14] border border-slate-800/80 rounded-lg p-2.5 transition-colors group cursor-pointer"
-              >
-                <svg className="w-5 h-5 text-white group-hover:text-[#d4af37] transition-colors" fill="currentColor" viewBox="0 0 24 24">
-                  <path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M15.97 4.17c.66-.81 1.11-1.93.99-3.06-1 .04-2.2.67-2.92 1.5-.62.72-1.16 1.86-1.02 2.97 1.11.08 2.24-.62 2.95-1.41z" />
-                </svg>
-                <div className="text-left leading-none text-white">
-                  <span className="text-[8px] text-slate-400 block uppercase font-bold">Download on the</span>
-                  <span className="text-[11px] font-bold">App Store</span>
-                </div>
-              </a>
-
-              {/* Google Play Store */}
-              <a
-                href="https://play.google.com/..."
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-center gap-2.5 bg-[#070e1b] hover:bg-[#050b14] border border-slate-800/80 rounded-lg p-2.5 transition-colors group cursor-pointer"
-              >
-                <svg className="w-5 h-5 text-white group-hover:text-[#d4af37] transition-colors" fill="currentColor" viewBox="0 0 24 24">
-                  <path d="M5 3.14a1.86 1.86 0 0 0-.44 1.3v15.12a1.86 1.86 0 0 0 .44 1.3l8.69-8.68zM18.66 11.23L15.3 9.34l-2.03 2.03 2.03 2.03 3.36-1.89a1.69 1.69 0 0 0 0-2.28zM14.28 13.96L5.86 22.38h.11a1.82 1.82 0 0 0 1.34-.63l7-3.95zM7.31 2.25a1.82 1.82 0 0 0-1.34.63l8.42 8.42 1.65-1.65-7-3.95a1.82 1.82 0 0 0-.73-.45z" />
-                </svg>
-                <div className="text-left leading-none text-white">
-                  <span className="text-[8px] text-slate-400 block uppercase font-bold">Get it on</span>
-                  <span className="text-[11px] font-bold">Google Play</span>
-                </div>
-              </a>
-            </div>
-          </div>
+          {/* App download buttons removed */}
         </div>
 
         {/* 4. Copyright Bar */}
         <div className="w-full bg-[#050b14] border-t border-slate-900/60 py-4 px-4 text-center text-[10px] text-slate-400 font-bold">
-          <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-2">
+          <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-center items-center gap-2">
             <span>
               © 2026 GSM GIRI. Powered by Innomatrics Technologies
             </span>
-            <div className="flex gap-4">
-              <span className="hover:text-[#d4af37] cursor-pointer">Agent Agreement</span>
-              <span>•</span>
-              <span className="hover:text-[#d4af37] cursor-pointer">PCI Compliance Certificate</span>
-              <span>•</span>
-              <span className="hover:text-[#d4af37] cursor-pointer">SLA Status (99.99%)</span>
-            </div>
           </div>
         </div>
 

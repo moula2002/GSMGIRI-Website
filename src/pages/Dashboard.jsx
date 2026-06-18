@@ -1,3 +1,4 @@
+import { useNavigate } from 'react-router-dom';
 import React, { useState } from 'react';
 import { UserIcon, ShieldIcon } from '../components/Icons';
 
@@ -7,10 +8,12 @@ export default function Dashboard({
   currency,
   balance,
   orders = [],
-  setActiveTab,
+  
   usersList = [],
   onAdminAddFunds
 }) {
+  const navigate = useNavigate();
+
   const [subTab, setSubTab] = useState('dashboard');
 
   // Manage Users Search/Fund States
@@ -229,7 +232,7 @@ export default function Dashboard({
 
                   {/* Add balance action trigger button */}
                   <button
-                    onClick={() => setActiveTab('wallet')}
+                    onClick={() => ('wallet')}
                     className="w-full bg-[#006666]/30 hover:bg-[#006666]/50 border border-white/20 text-white font-bold py-3.5 rounded-2xl transition-all mt-6 flex items-center justify-center gap-2 cursor-pointer shadow-inner text-sm"
                   >
                     <span>+</span> Add Balance
@@ -284,7 +287,7 @@ export default function Dashboard({
 
                   {/* Total Orders Placed (spans full width of the status block) */}
                   <div
-                    onClick={() => setActiveTab('history')}
+                    onClick={() => ('history')}
                     className="col-span-2 bg-[#008080] hover:bg-[#006666] text-white rounded-3xl p-5 flex items-center justify-between cursor-pointer transition-all shadow-md group border border-[#006666]/30"
                   >
                     <div className="flex items-center gap-4">
@@ -312,7 +315,7 @@ export default function Dashboard({
                 <div className="bg-white border border-slate-200/60 rounded-3xl p-6 shadow-sm">
                   <div className="flex justify-between items-center mb-4">
                     <h3 className="text-sm font-bold text-slate-700 uppercase tracking-wider">Invoice</h3>
-                    <button onClick={() => setActiveTab('history')} className="text-xs font-bold text-[#008080] hover:underline cursor-pointer">
+                    <button onClick={() => ('history')} className="text-xs font-bold text-[#008080] hover:underline cursor-pointer">
                       View All
                     </button>
                   </div>
@@ -339,7 +342,7 @@ export default function Dashboard({
                 <div className="bg-white border border-slate-200/60 rounded-3xl p-6 shadow-sm">
                   <div className="flex justify-between items-center mb-4">
                     <h3 className="text-sm font-bold text-slate-700 uppercase tracking-wider">Statement</h3>
-                    <button onClick={() => setActiveTab('history')} className="text-xs font-bold text-[#008080] hover:underline cursor-pointer">
+                    <button onClick={() => ('history')} className="text-xs font-bold text-[#008080] hover:underline cursor-pointer">
                       View All
                     </button>
                   </div>

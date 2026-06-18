@@ -1,10 +1,13 @@
+import { useNavigate } from 'react-router-dom';
 import React, { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { login as loginApi } from '../services/authService';
 import { UserIcon, KeyIcon } from '../components/common/Icons';
 import logoImg from '../assets/GSM giri logo.png';
 
-export default function LoginPage({ setActiveTab }) {
+export default function LoginPage({ }) {
+  const navigate = useNavigate();
+
   const { login } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -19,7 +22,7 @@ export default function LoginPage({ setActiveTab }) {
     try {
       const data = await loginApi(email, password);
       login(data.user);
-      setActiveTab('home');
+      ('home');
     } catch (err) {
       setError(err.message);
     } finally {
@@ -91,7 +94,7 @@ export default function LoginPage({ setActiveTab }) {
 
         <div className="text-center mt-6 text-xs text-slate-400">
           Don't have an account?{' '}
-          <button onClick={() => setActiveTab('register')} className="text-[#d4af37] font-bold hover:underline cursor-pointer">
+          <button onClick={() => ('register')} className="text-[#d4af37] font-bold hover:underline cursor-pointer">
             Register here
           </button>
         </div>

@@ -1,3 +1,4 @@
+import { useNavigate } from 'react-router-dom';
 import React, { useEffect } from 'react';
 import { GlobeIcon, KeyIcon } from '../components/Icons';
 
@@ -7,8 +8,9 @@ export default function CategoryServices({
   categories = [],
   currency,
   onBookService,
-  setActiveTab
-}) {
+  }) {
+  const navigate = useNavigate();
+
   // Scroll to top when this page loads
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -116,7 +118,7 @@ export default function CategoryServices({
       
       {/* Back Button */}
       <button
-        onClick={() => setActiveTab('home')}
+        onClick={() => ('home')}
         className="mb-4 flex items-center gap-2 text-xs font-black text-slate-600 hover:text-[#d4af37] transition-colors group cursor-pointer"
       >
         <span className="w-7 h-7 rounded-lg bg-white border border-slate-200 group-hover:border-[#d4af37]/50 flex items-center justify-center shadow-sm transition-all group-hover:bg-amber-50/20">

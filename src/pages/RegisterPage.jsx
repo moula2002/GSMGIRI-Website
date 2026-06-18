@@ -1,10 +1,13 @@
+import { useNavigate } from 'react-router-dom';
 import React, { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { register as registerApi } from '../services/authService';
 import { UserIcon, KeyIcon, WalletIcon } from '../components/common/Icons';
 import logoImg from '../assets/GSM giri logo.png';
 
-export default function RegisterPage({ setActiveTab }) {
+export default function RegisterPage({ }) {
+  const navigate = useNavigate();
+
   const { login } = useAuth();
   const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
@@ -23,7 +26,7 @@ export default function RegisterPage({ setActiveTab }) {
     try {
       const data = await registerApi(username, email, mobile, password, currency, company || 'GSM GIRI B2B');
       login(data.user);
-      setActiveTab('home');
+      ('home');
     } catch (err) {
       setError(err.message);
     } finally {
@@ -158,7 +161,7 @@ export default function RegisterPage({ setActiveTab }) {
 
         <div className="text-center mt-6 text-xs text-slate-400">
           Already have an account?{' '}
-          <button onClick={() => setActiveTab('login')} className="text-[#d4af37] font-bold hover:underline cursor-pointer">
+          <button onClick={() => ('login')} className="text-[#d4af37] font-bold hover:underline cursor-pointer">
             Login here
           </button>
         </div>

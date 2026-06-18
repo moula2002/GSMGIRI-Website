@@ -1,3 +1,4 @@
+import { useNavigate } from 'react-router-dom';
 import React, { useState } from 'react';
 import { XIcon, ShieldIcon, GlobeIcon, WalletIcon, UserIcon, KeyIcon } from './Icons';
 
@@ -43,8 +44,9 @@ export default function Modals({
   insufficientFundsData,
   setInsufficientFundsData,
   activeTab,
-  setActiveTab
-}) {
+  }) {
+  const navigate = useNavigate();
+
   // Auth state
   const [authTab, setAuthTab] = useState('login');
   // View Code modal state
@@ -573,7 +575,7 @@ export default function Modals({
               <button
                 onClick={() => {
                   setInsufficientFundsData(null);
-                  setActiveTab('wallet');
+                  ('wallet');
                 }}
                 className="flex-1 bg-[#d4af37] hover:bg-[#c5a059] text-slate-950 font-black py-2.5 rounded-lg text-xs transition-all flex items-center justify-center gap-1.5 shadow-sm border border-[#d4af37]/30 cursor-pointer"
               >

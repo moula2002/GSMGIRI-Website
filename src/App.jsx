@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { Routes, Route, useNavigate, useLocation, Navigate } from 'react-router-dom';
 import TopHeader from './components/TopHeader';
 import Navbar from './components/Navbar';
 import Home from './pages/Home';
@@ -18,11 +19,22 @@ import Dashboard from './pages/Dashboard';
 import Statement from './pages/Statement';
 import ImeiProductsPage from './pages/ImeiProductsPage';
 import RemoteProductsPage from './pages/RemoteProductsPage';
-
+import PrivacyPolicy from './pages/PrivacyPolicy';
+import TermsOfService from './pages/TermsOfService';
+import DeliveryPolicy from './pages/DeliveryPolicy';
+import CancellationPolicy from './pages/CancellationPolicy';
+import RefundPolicy from './pages/RefundPolicy';
 const API_BASE = 'https://gsmgiri-website-backend.onrender.com/api';
 
 export default function App() {
-  const [activeTab, setActiveTab] = useState('home');
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  // Scroll to top on route change
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [location.pathname]);
+
   const [currency, setCurrency] = useState('INR');
   const [language, setLanguage] = useState('EN');
   const [balance, setBalance] = useState(0);
@@ -100,12 +112,12 @@ export default function App() {
 
   // Guard protected tabs & redirect guests to login modal
   useEffect(() => {
-    const protectedTabs = ['checkout', 'wallet', 'history', 'dashboard', 'statement'];
-    if (protectedTabs.includes(activeTab) && !user) {
-      setActiveTab('home');
+    const protectedPaths = ['/checkout', '/wallet', '/history', '/dashboard', '/statement'];
+    if (protectedPaths.some(p => location.pathname.startsWith(p)) && !user) {
+      navigate('/');
       setOpenAuthModal(true);
     }
-  }, [activeTab, user]);
+  }, [location.pathname, user, navigate]);
 
   // Synchronize storage updates across tabs/components
   useEffect(() => {
@@ -269,7 +281,7 @@ export default function App() {
       await fetch(`${API_BASE}/auth/logout`, { method: 'POST' });
       setUser(null);
       localStorage.removeItem('gsmgiri_user');
-      setActiveTab('home');
+      navigate('/');
     } catch (error) {
       console.error('Logout failed:', error);
     }
@@ -302,7 +314,7 @@ export default function App() {
 
         // If there was a selected product, redirect directly to Checkout after success modal dismisses
         setTimeout(() => {
-          setActiveTab('checkout');
+          navigate('/checkout');
         }, 3000);
       }
     } catch (error) {
@@ -319,14 +331,14 @@ export default function App() {
     }
 
     setSelectedProduct(service);
-    setActiveTab('wallet');
+    navigate('/wallet');
   };
 
   // Product detail view selector — tracks which page to go back to
   const handleProductSelect = (service, sourcePage = 'services') => {
     setSelectedProduct(service);
     setProductBackTab(sourcePage);
-    setActiveTab('product-detail');
+    navigate(`/product/${service.id || service._id || 'detail'}`);
   };
 
   return (
@@ -341,8 +353,6 @@ export default function App() {
 
       {/* Main navigation */}
       <Navbar
-        activeTab={activeTab}
-        setActiveTab={setActiveTab}
         currency={currency}
         setCurrency={setCurrency}
         balance={balance}
@@ -361,161 +371,151 @@ export default function App() {
 
       {/* Panel routing container */}
       <main className="flex-grow">
-        {activeTab === 'home' && (
-          <Home
-            services={services}
-            banners={banners}
-            promoColumns={promoColumns}
-            clients={clients}
-            currency={currency}
-            onBookService={handleProductSelect}
-            setSearchQuery={setSearchQuery}
-            setActiveTab={setActiveTab}
-          />
-        )}
-
-        {activeTab === 'services' && (
-          <div className="py-6">
-            {searchQuery && (
-              <div className="max-w-7xl mx-auto px-4 mb-4 flex items-center justify-between bg-slate-50/40 border border-slate-100 p-3.5 rounded-xl">
-                <span className="text-xs text-slate-700">
-                  Showing results for query: <span className="font-bold text-slate-850">"{searchQuery}"</span>
-                </span>
-                <button
-                  onClick={() => {
-                    setSearchQuery('');
-                    setActiveTab('services');
-                  }}
-                  className="text-xs text-[#d4af37] hover:text-[#c5a059] font-bold border border-slate-200 hover:border-[#d4af37] hover:bg-amber-50/10 px-3 py-1.5 rounded transition-all"
-                >
-                  Clear Filter
-                </button>
-              </div>
-            )}
-
-            <Services
+        <Routes>
+          <Route path="/" element={
+            <Home
               services={services}
-              searchQuery={searchQuery}
+              banners={banners}
               promoColumns={promoColumns}
+              clients={clients}
               currency={currency}
               onBookService={handleProductSelect}
-              categories={categories}
-              activeCategory={activeCategory}
-              setActiveCategory={setActiveCategory}
+              setSearchQuery={setSearchQuery}
             />
-          </div>
-        )}
-
-        {activeTab === 'category-services' && (
-          <CategoryServices
-            services={services}
-            categorySlug={selectedCategorySlug}
-            categories={categories}
-            currency={currency}
-            onBookService={handleProductSelect}
-            setActiveTab={setActiveTab}
-          />
-        )}
-
-        {activeTab === 'imei-products' && (
-          <ImeiProductsPage
-            imeiProducts={imeiProducts}
-            currency={currency}
-            onProductSelect={(p) => handleProductSelect(p, 'imei-products')}
-            user={user}
-            setOpenAuthModal={setOpenAuthModal}
-          />
-        )}
-
-        {activeTab === 'remote-products' && (
-          <RemoteProductsPage
-            remoteProducts={remoteProducts}
-            currency={currency}
-            onProductSelect={(p) => handleProductSelect(p, 'remote-products')}
-            user={user}
-            setOpenAuthModal={setOpenAuthModal}
-          />
-        )}
-
-        {activeTab === 'product-detail' && selectedProduct && (
-          <ProductDetail
-            product={selectedProduct}
-            services={services}
-            setProduct={setSelectedProduct}
-            currency={currency}
-            user={user}
-            setOpenAuthModal={setOpenAuthModal}
-            onBookService={onBookService}
-            setActiveTab={setActiveTab}
-            backTab={productBackTab}
-            cart={cart}
-            setCart={setCart}
-            wishlist={wishlist}
-            setWishlist={setWishlist}
-          />
-        )}
-        {activeTab === 'wallet' && (
-          <Wallet
-            currency={currency}
-            balance={balance}
-            onAddFunds={onAddFunds}
-            prefilledAmount={selectedProduct ? Math.ceil(selectedProduct.priceINR) : null}
-          />
-        )}
-
-        {activeTab === 'history' && (
-          <History
-            orders={orders}
-            currency={currency}
-            onViewInvoice={setActiveInvoice}
-            user={user}
-            setOrders={setOrders}
-          />
-        )}
-
-        {activeTab === 'about' && (
-          <About />
-        )}
-
-        {activeTab === 'contact' && (
-          <Contact user={user} />
-        )}
-
-        {activeTab === 'cart' && (
-          <CartPage
-            cart={cart}
-            setCart={setCart}
-            currency={currency}
-            user={user}
-            setOpenAuthModal={setOpenAuthModal}
-            setActiveTab={setActiveTab}
-            setSelectedProduct={setSelectedProduct}
-          />
-        )}
-
-        {activeTab === 'dashboard' && (
-          <Dashboard
-            user={user}
-            setUser={setUser}
-            currency={currency}
-            balance={balance}
-            orders={orders}
-            services={services}
-            setActiveTab={setActiveTab}
-            wishlist={wishlist}
-            setWishlist={setWishlist}
-            usersList={usersList}
-            onAdminAddFunds={onAdminAddFunds}
-          />
-        )}
-
-        {activeTab === 'statement' && (
-          <Statement
-            orders={orders}
-            balance={balance}
-            currency={currency}
-          />
-        )}
+          } />
+          <Route path="/services" element={
+            <div className="py-6">
+              {searchQuery && (
+                <div className="max-w-7xl mx-auto px-4 mb-4 flex items-center justify-between bg-slate-50/40 border border-slate-100 p-3.5 rounded-xl">
+                  <span className="text-xs text-slate-700">
+                    Showing results for query: <span className="font-bold text-slate-850">"{searchQuery}"</span>
+                  </span>
+                  <button
+                    onClick={() => {
+                      setSearchQuery('');
+                      navigate('/services');
+                    }}
+                    className="text-xs text-[#d4af37] hover:text-[#c5a059] font-bold border border-slate-200 hover:border-[#d4af37] hover:bg-amber-50/10 px-3 py-1.5 rounded transition-all"
+                  >
+                    Clear Filter
+                  </button>
+                </div>
+              )}
+              <Services
+                services={services}
+                searchQuery={searchQuery}
+                promoColumns={promoColumns}
+                currency={currency}
+                onBookService={handleProductSelect}
+                categories={categories}
+                activeCategory={activeCategory}
+                setActiveCategory={setActiveCategory}
+              />
+            </div>
+          } />
+          <Route path="/category-services" element={
+            <CategoryServices
+              services={services}
+              categorySlug={selectedCategorySlug}
+              categories={categories}
+              currency={currency}
+              onBookService={handleProductSelect}
+            />
+          } />
+          <Route path="/imei-products" element={
+            <ImeiProductsPage
+              imeiProducts={imeiProducts}
+              currency={currency}
+              onProductSelect={(p) => handleProductSelect(p, 'imei-products')}
+              user={user}
+              setOpenAuthModal={setOpenAuthModal}
+            />
+          } />
+          <Route path="/remote-products" element={
+            <RemoteProductsPage
+              remoteProducts={remoteProducts}
+              currency={currency}
+              onProductSelect={(p) => handleProductSelect(p, 'remote-products')}
+              user={user}
+              setOpenAuthModal={setOpenAuthModal}
+            />
+          } />
+          <Route path="/product/:id" element={
+            selectedProduct ? (
+              <ProductDetail
+                product={selectedProduct}
+                services={services}
+                setProduct={setSelectedProduct}
+                currency={currency}
+                user={user}
+                setOpenAuthModal={setOpenAuthModal}
+                onBookService={onBookService}
+                backTab={productBackTab}
+                cart={cart}
+                setCart={setCart}
+                wishlist={wishlist}
+                setWishlist={setWishlist}
+              />
+            ) : (
+              <Navigate to="/services" />
+            )
+          } />
+          <Route path="/wallet" element={
+            <Wallet
+              currency={currency}
+              balance={balance}
+              onAddFunds={onAddFunds}
+              prefilledAmount={selectedProduct ? Math.ceil(selectedProduct.priceINR) : null}
+            />
+          } />
+          <Route path="/history" element={
+            <History
+              orders={orders}
+              currency={currency}
+              onViewInvoice={setActiveInvoice}
+              user={user}
+              setOrders={setOrders}
+            />
+          } />
+          <Route path="/about" element={<About />} />
+          <Route path="/contact" element={<Contact user={user} />} />
+          <Route path="/cart" element={
+            <CartPage
+              cart={cart}
+              setCart={setCart}
+              currency={currency}
+              user={user}
+              setOpenAuthModal={setOpenAuthModal}
+              setSelectedProduct={setSelectedProduct}
+            />
+          } />
+          <Route path="/dashboard" element={
+            <Dashboard
+              user={user}
+              setUser={setUser}
+              currency={currency}
+              balance={balance}
+              orders={orders}
+              services={services}
+              wishlist={wishlist}
+              setWishlist={setWishlist}
+              usersList={usersList}
+              onAdminAddFunds={onAdminAddFunds}
+            />
+          } />
+          <Route path="/statement" element={
+            <Statement
+              orders={orders}
+              balance={balance}
+              currency={currency}
+            />
+          } />
+          <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+          <Route path="/terms-of-service" element={<TermsOfService />} />
+          <Route path="/delivery-policy" element={<DeliveryPolicy />} />
+          <Route path="/cancellation-policy" element={<CancellationPolicy />} />
+          <Route path="/refund-policy" element={<RefundPolicy />} />
+        </Routes>
       </main>
 
       {/* Footer layout */}
@@ -542,8 +542,6 @@ export default function App() {
         setFundSuccessData={setFundSuccessData}
         insufficientFundsData={insufficientFundsData}
         setInsufficientFundsData={setInsufficientFundsData}
-        activeTab={activeTab}
-        setActiveTab={setActiveTab}
       />
     </div>
   );

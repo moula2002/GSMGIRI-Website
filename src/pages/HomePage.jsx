@@ -1,3 +1,4 @@
+import { useNavigate } from 'react-router-dom';
 import React from 'react';
 import Hero from './Hero';
 import { GlobeIcon, KeyIcon } from '../components/common/Icons';
@@ -13,8 +14,9 @@ export default function HomePage({
   currency,
   onBookService,
   setSearchQuery,
-  setActiveTab
-}) {
+  }) {
+  const navigate = useNavigate();
+
   const bestSellingServices = (services || []).filter(s => s.isBestSelling === true);
   const recentAddedServices = [...(services || [])]
     .sort((a, b) => {
@@ -154,7 +156,7 @@ export default function HomePage({
         banners={banners}
         onSearchQuery={(q) => {
           setSearchQuery(q);
-          setActiveTab('services');
+          ('services');
         }}
       />
 

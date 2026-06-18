@@ -75,7 +75,7 @@ export default function Contact({ user }) {
                 <span className="text-base text-[#d4af37]">📞</span>
                 <div>
                   <span className="font-bold text-slate-700 block">Phone & WhatsApp</span>
-                  <a href="tel:+918247005409" className="text-slate-605 font-mono select-all hover:text-[#d4af37]">+91 824-700-5409</a>
+                  <a href="tel:+916363262006" className="text-slate-605 font-mono select-all hover:text-[#d4af37]">+91 63632 62006</a>
                 </div>
               </div>
 

@@ -1,3 +1,4 @@
+import { useNavigate } from 'react-router-dom';
 import React, { useState, useEffect } from 'react';
 import { GlobeIcon, KeyIcon } from '../components/Icons';
 export default function ProductDetail({
@@ -8,13 +9,15 @@ export default function ProductDetail({
   user,
   setOpenAuthModal,
   onBookService,
-  setActiveTab,
+  
   backTab = 'services',
   cart = [],
   setCart,
   wishlist = [],
   setWishlist
 }) {
+  const navigate = useNavigate();
+
   const [agreed, setAgreed] = useState(true);
 
   // Scroll to top whenever this page is opened
@@ -159,7 +162,7 @@ export default function ProductDetail({
     <section className="max-w-7xl mx-auto px-4 py-8 relative font-sans text-left">
       {/* Back Button */}
       <button
-        onClick={() => setActiveTab(backTab)}
+        onClick={() => (backTab)}
         className="mb-4 flex items-center gap-2 text-xs font-black text-slate-600 hover:text-[#d4af37] transition-colors group cursor-pointer"
       >
         <span className="w-7 h-7 rounded-lg bg-white border border-slate-200 group-hover:border-[#d4af37]/50 flex items-center justify-center shadow-sm transition-all group-hover:bg-amber-50/20">

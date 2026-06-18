@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { HomeIcon, GlobeIcon, ChevronDownIcon, MenuIcon, XIcon, UserIcon } from './Icons';
 import logoImg from '../assets/GSM giri logo.png';
 
@@ -11,8 +12,6 @@ const BookIcon = ({ className = "w-4 h-4" }) => (
 );
 
 export default function Navbar({
-  activeTab,
-  setActiveTab,
   currency,
   setCurrency,
   balance,
@@ -29,6 +28,8 @@ export default function Navbar({
   wishlist = []
 }) {
   const [dropdownOpen, setDropdownOpen] = useState(false);
+  const location = useLocation();
+  const navigate = useNavigate();
   const [serviceDropdownOpen, setServiceDropdownOpen] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
@@ -43,7 +44,7 @@ export default function Navbar({
 
   const handleHomeClick = () => {
     if (setSearchQuery) setSearchQuery('');
-    setActiveTab('home');
+    navigate('/');
     setMobileMenuOpen(false);
   };
 
@@ -51,27 +52,27 @@ export default function Navbar({
     if (setSearchQuery) setSearchQuery('');
     if (categorySlug === 'all') {
       if (setActiveCategory) setActiveCategory('all');
-      setActiveTab('services');
+      navigate('/services');
     } else {
       if (setSelectedCategorySlug) setSelectedCategorySlug(categorySlug);
-      setActiveTab('category-services');
+      navigate('/category-services');
     }
     setServiceDropdownOpen(false);
     setMobileMenuOpen(false);
   };
 
   const handleImeiClick = () => {
-    setActiveTab('imei-products');
+    navigate('/imei-products');
     setMobileMenuOpen(false);
   };
 
   const handleWalletClick = () => {
-    setActiveTab('wallet');
+    navigate('/wallet');
     setMobileMenuOpen(false);
   };
 
   const handleHistoryClick = () => {
-    setActiveTab('history');
+    navigate('/history');
     setMobileMenuOpen(false);
   };
 
@@ -90,7 +91,7 @@ export default function Navbar({
             <button
               onClick={handleHomeClick}
               className={`flex items-center gap-1.5 text-sm font-semibold transition-all py-2 text-white hover:text-white/80 cursor-pointer ${
-                activeTab === 'home' ? 'opacity-100 font-bold border-b-2 border-white' : 'opacity-95'
+                location.pathname === '/' ? 'opacity-100 font-bold border-b-2 border-white' : 'opacity-95'
               }`}
             >
               <HomeIcon className="w-4 h-4 text-white" />
@@ -102,7 +103,7 @@ export default function Navbar({
               <button
                 onClick={() => setServiceDropdownOpen(!serviceDropdownOpen)}
                 className={`flex items-center gap-1.5 text-sm font-semibold transition-all py-2 text-white hover:text-white/80 cursor-pointer ${
-                  activeTab === 'services' || activeTab === 'category-services' ? 'opacity-100 font-bold border-b-2 border-white' : 'opacity-95'
+                  location.pathname === '/services' || location.pathname === '/category-services' ? 'opacity-100 font-bold border-b-2 border-white' : 'opacity-95'
                 }`}
               >
                 <span>Service List</span>
@@ -137,7 +138,7 @@ export default function Navbar({
             <button
               onClick={handleImeiClick}
               className={`flex items-center gap-1.5 text-sm font-semibold transition-all py-2 text-white hover:text-white/80 cursor-pointer ${
-                activeTab === 'imei-products' ? 'opacity-100 font-bold border-b-2 border-white' : 'opacity-95'
+                location.pathname === '/imei-products' ? 'opacity-100 font-bold border-b-2 border-white' : 'opacity-95'
               }`}
             >
               <span>IMEI Service</span>
@@ -145,9 +146,9 @@ export default function Navbar({
 
             {/* Remote/ Tool-Rent */}
             <button
-              onClick={() => { setActiveTab('remote-products'); setMobileMenuOpen(false); }}
+              onClick={() => { navigate('/remote-products'); setMobileMenuOpen(false); }}
               className={`flex items-center gap-1.5 text-sm font-semibold transition-all py-2 text-white hover:text-white/80 cursor-pointer ${
-                activeTab === 'remote-products' ? 'opacity-100 font-bold border-b-2 border-white' : 'opacity-95'
+                location.pathname === '/remote-products' ? 'opacity-100 font-bold border-b-2 border-white' : 'opacity-95'
               }`}
             >
               <BookIcon className="w-4 h-4" />
@@ -158,7 +159,7 @@ export default function Navbar({
             <button
               onClick={() => user ? handleWalletClick() : setOpenAuthModal(true)}
               className={`flex items-center gap-1.5 text-sm font-semibold transition-all py-2 text-white hover:text-white/80 cursor-pointer ${
-                activeTab === 'wallet' ? 'opacity-100 font-bold border-b-2 border-white' : 'opacity-95'
+                location.pathname === '/wallet' ? 'opacity-100 font-bold border-b-2 border-white' : 'opacity-95'
               }`}
             >
               <span>INR Fund Add</span>
@@ -168,7 +169,7 @@ export default function Navbar({
             <button
               onClick={() => user ? handleHistoryClick() : setOpenAuthModal(true)}
               className={`flex items-center gap-1.5 text-sm font-semibold transition-all py-2 text-white hover:text-white/80 cursor-pointer ${
-                activeTab === 'history' ? 'opacity-100 font-bold border-b-2 border-white' : 'opacity-95'
+                location.pathname === '/history' ? 'opacity-100 font-bold border-b-2 border-white' : 'opacity-95'
               }`}
             >
               <span>Order history</span>
@@ -204,7 +205,7 @@ export default function Navbar({
                   </div>
                   <div className="flex flex-col text-left leading-tight shrink-0">
                     <span className="text-xs font-bold text-white leading-none">{user.username}</span>
-                    <span className="text-[8px] font-black text-white/70 tracking-wider uppercase mt-1">{user.role || 'CUSTOMER'}</span>
+                    <span className="text-[8px] font-black text-white/70 tracking-wider uppercase mt-1">{user.role === 'agent' ? 'CUSTOMER' : (user.role || 'CUSTOMER')}</span>
                   </div>
                   <div className="h-6 w-px bg-white/20 mx-1.5 self-center shrink-0"></div>
                   <span className="text-xs font-extrabold text-white shrink-0">{formatBalance()}</span>
@@ -218,7 +219,7 @@ export default function Navbar({
                       
                       {/* Dashboard Option */}
                       <button
-                        onClick={() => { setActiveTab('dashboard'); setDropdownOpen(false); }}
+                        onClick={() => { navigate('/dashboard'); setDropdownOpen(false); }}
                         className="flex items-center gap-4 w-full text-left px-4 py-3 rounded-xl text-sm font-medium text-slate-700 hover:bg-slate-50 transition-colors cursor-pointer"
                       >
                         <svg className="w-5 h-5 text-slate-700 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
@@ -234,7 +235,7 @@ export default function Navbar({
 
                       {/* Order History */}
                       <button
-                        onClick={() => { setActiveTab('history'); setDropdownOpen(false); }}
+                        onClick={() => { navigate('/history'); setDropdownOpen(false); }}
                         className="flex items-center gap-4 w-full text-left px-4 py-3 rounded-xl text-sm font-medium text-slate-700 hover:bg-slate-50 transition-colors cursor-pointer"
                       >
                         <svg className="w-5 h-5 text-slate-700 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
@@ -248,7 +249,7 @@ export default function Navbar({
 
                       {/* Statement */}
                       <button
-                        onClick={() => { setActiveTab('statement'); setDropdownOpen(false); }}
+                        onClick={() => { navigate('/statement'); setDropdownOpen(false); }}
                         className="flex items-center gap-4 w-full text-left px-4 py-3 rounded-xl text-sm font-medium text-slate-700 hover:bg-slate-50 transition-colors cursor-pointer"
                       >
                         <svg className="w-5 h-5 text-slate-700 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
@@ -261,7 +262,7 @@ export default function Navbar({
 
                       {/* Invoice */}
                       <button
-                        onClick={() => { setActiveTab('statement'); setDropdownOpen(false); }}
+                        onClick={() => { navigate('/statement'); setDropdownOpen(false); }}
                         className="flex items-center gap-4 w-full text-left px-4 py-3 rounded-xl text-sm font-medium text-slate-700 hover:bg-slate-50 transition-colors cursor-pointer"
                       >
                         <svg className="w-5 h-5 text-slate-700 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
@@ -275,7 +276,7 @@ export default function Navbar({
 
                       {/* Add Balance */}
                       <button
-                        onClick={() => { setActiveTab('wallet'); setDropdownOpen(false); }}
+                        onClick={() => { navigate('/wallet'); setDropdownOpen(false); }}
                         className="flex items-center gap-4 w-full text-left px-4 py-3 rounded-xl text-sm font-medium text-slate-700 hover:bg-slate-50 transition-colors cursor-pointer"
                       >
                         <svg className="w-5 h-5 text-slate-700 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75">
@@ -369,7 +370,7 @@ export default function Navbar({
           </button>
 
           <button
-            onClick={() => { setActiveTab('remote-products'); setMobileMenuOpen(false); }}
+            onClick={() => { navigate('/remote-products'); setMobileMenuOpen(false); }}
             className="text-left w-full px-3 py-2 rounded-md text-sm font-semibold text-white hover:bg-white/10"
           >
             Remote/ Tool-Rent

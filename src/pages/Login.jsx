@@ -1,7 +1,10 @@
+import { useNavigate } from 'react-router-dom';
 import React, { useState } from 'react';
 import { UserIcon, KeyIcon, GlobeIcon, WalletIcon } from '../components/Icons';
 
-export default function Login({ handleLoginSubmit, setActiveTab }) {
+export default function Login({ handleLoginSubmit, }) {
+  const navigate = useNavigate();
+
   const [authTab, setAuthTab] = useState('login');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -35,7 +38,7 @@ export default function Login({ handleLoginSubmit, setActiveTab }) {
 
       // Successful login/register
       handleLoginSubmit(data.user);
-      setActiveTab('home');
+      ('home');
     } catch (err) {
       setError(err.message);
     } finally {

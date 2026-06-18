@@ -1,3 +1,4 @@
+import { useNavigate } from 'react-router-dom';
 import React from 'react';
 import Hero from './Hero';
 import { GlobeIcon, KeyIcon } from '../components/Icons';
@@ -13,8 +14,9 @@ export default function Home({
   currency,
   onBookService,
   setSearchQuery,
-  setActiveTab
-}) {
+  }) {
+  const navigate = useNavigate();
+
   // Filter lists from MongoDB using boolean flags
   const bestSellingServices = (services || []).filter(s => s.isBestSelling === true);
   const recentAddedServices = [...(services || [])]
@@ -163,7 +165,7 @@ export default function Home({
         banners={banners}
         onSearchQuery={(q) => {
           setSearchQuery(q);
-          setActiveTab('services');
+          ('services');
         }}
       />
 
