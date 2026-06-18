@@ -1,5 +1,5 @@
 import { useNavigate } from 'react-router-dom';
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import Hero from './Hero';
 import { GlobeIcon, KeyIcon } from '../components/Icons';
 import bannerGsmGiri from '../assets/banner_gsmgiri.png';
@@ -16,6 +16,26 @@ export default function Home({
   setSearchQuery,
   }) {
   const navigate = useNavigate();
+  const [showAdPopup, setShowAdPopup] = useState(false);
+
+  useEffect(() => {
+    const lastClosed = localStorage.getItem('gsmgiri_ad_popup_closed');
+    const now = new Date().getTime();
+    const displayPeriod = 24 * 60 * 60 * 1000; // 24 hours configured period
+
+    // Only show if never closed, or if the configured period has passed
+    if (!lastClosed || now - parseInt(lastClosed, 10) > displayPeriod) {
+      const timer = setTimeout(() => {
+        setShowAdPopup(true);
+      }, 800);
+      return () => clearTimeout(timer);
+    }
+  }, []);
+
+  const handleCloseAdPopup = () => {
+    setShowAdPopup(false);
+    localStorage.setItem('gsmgiri_ad_popup_closed', new Date().getTime().toString());
+  };
 
   // Filter lists from MongoDB using boolean flags
   const bestSellingServices = (services || []).filter(s => s.isBestSelling === true);
@@ -160,6 +180,68 @@ export default function Home({
 
   return (
     <div>
+      {/* Important Notice Pop-Up */}
+      {showAdPopup && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-6 backdrop-blur-sm bg-slate-900/70 animate-fade-in transition-opacity">
+          <div className="relative w-full max-w-2xl bg-white rounded-2xl shadow-2xl overflow-hidden animate-slide-up border border-slate-200 flex flex-col max-h-[90vh]">
+            {/* Header */}
+            <div className="bg-slate-900 p-5 shrink-0 flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <span className="bg-rose-500 text-white text-[10px] font-black uppercase tracking-widest px-2.5 py-1 rounded shadow-lg">Important Notice</span>
+                <h2 className="text-white text-lg sm:text-xl font-black">Terms & Conditions</h2>
+              </div>
+              <button 
+                onClick={handleCloseAdPopup}
+                className="p-2 hover:bg-white/10 text-slate-300 hover:text-white rounded-lg transition-all cursor-pointer"
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+              </button>
+            </div>
+            
+            {/* Scrollable Content */}
+            <div className="p-6 sm:p-8 overflow-y-auto flex-1 font-sans text-slate-700 text-sm whitespace-pre-wrap leading-relaxed">
+{`Important notice that requires your acknowledgment before using this website.
+
+All files and tools on GsmGiri are for educational purposes only.
+
+🔧 Device repair, firmware updates, FRP operations & software fixes
+📱 Personal devices or devices with authorized owner permission
+🧾 Owner must provide: device bill/box — if no box, customer ID proof + signature + passport photo required
+
+━━━━━━━━━━━━━━━━
+🚫 STRICTLY PROHIBITED
+━━━━━━━━━━━━━━━━
+❌ Blacklisted or lost/stolen devices — DO NOT process
+❌ Auth server operations — clean IMEI devices only
+❌ Any device without proper owner authorization & documentation
+Before proceeding, please verify the device status here: CEIR IMEI Verification.
+
+━━━━━━━━━━━━━━━━
+📋 TERMS & CONDITIONS
+━━━━━━━━━━━━━━━━
+✔️ Must be 18+ years old
+✔️ Must own the device or have owner's written permission
+✔️ Must comply with local laws and regulations
+✔️ Device bill/box OR valid ID proof + signature + passport photo required
+✔️ Only clean, authorized devices permitted — no blacklisted/lost devices
+✔️ All OTP & Credits TOOLs are NON-REFUNDABLE once used
+
+GsmGiri assumes no responsibility for any misuse, legal consequences, or device damage caused by the use of these files & tools. By using this site, you agree to these terms.`}
+            </div>
+            
+            {/* Action Footer */}
+            <div className="p-5 border-t border-slate-200 bg-slate-50 shrink-0 flex justify-end">
+              <button 
+                onClick={handleCloseAdPopup}
+                className="px-8 py-3 bg-[#2563EB] hover:bg-blue-700 text-white font-black uppercase tracking-wider rounded-xl shadow-lg shadow-blue-500/30 transition-all cursor-pointer"
+              >
+                I Agree & Continue
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Carousel & Search Bar */}
       <Hero
         banners={banners}

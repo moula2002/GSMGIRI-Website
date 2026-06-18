@@ -28,8 +28,8 @@ export default function Statement({ orders = [], balance = 0, currency }) {
       id: o.id,
       dateTime: `${o.date} ${o.time || '00:00'}`,
       description: isCredit 
-        ? 'Balance added by UPI by Paytm' 
-        : `Place Order (Web)`,
+        ? (o.title || 'Balance added to Wallet')
+        : (o.title || 'Place Order (Web)'),
       type: isCredit ? 'CREDIT' : 'DEBIT',
       amount: amountVal,
       balance: stepBalance,
