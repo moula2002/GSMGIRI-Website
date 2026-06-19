@@ -4,6 +4,8 @@ import { GlobeIcon, KeyIcon } from '../components/Icons';
 export default function ProductDetail({
   product,
   services = [],
+  imeiProducts = [],
+  remoteProducts = [],
   setProduct,
   currency,
   user,
@@ -150,6 +152,43 @@ export default function ProductDetail({
 
   // Find related services of same category
   const getRelatedServices = () => {
+    if (product.type === 'IMEI Service') {
+      return imeiProducts
+        .filter(item => (item.id || item._id) !== product.id)
+        .map(item => ({
+          id: item.id || item._id,
+          title: item.name,
+          desc: item.description || '',
+          priceINR: item.price || 0,
+          type: 'IMEI Service',
+          processing: item.duration || 'MINUTES',
+          isInstant: true,
+          thumbType: 'default',
+          image: item.image || '',
+          status: item.status || 'Active'
+        }))
+        .slice(0, 4);
+    }
+    
+    if (product.category === 'remote') {
+      return remoteProducts
+        .filter(item => (item.id || item._id) !== product.id)
+        .map(item => ({
+          id: item.id || item._id,
+          title: item.name,
+          desc: item.description || '',
+          priceINR: item.rentalPrice || 0,
+          category: 'remote',
+          type: 'Remote / Tool-Rent',
+          processing: item.duration || 'INSTANT',
+          isInstant: true,
+          thumbType: 'rent',
+          image: item.image || '',
+          status: item.status || 'Active'
+        }))
+        .slice(0, 4);
+    }
+
     return services
       .filter((item) => item.category === product.category && item.id !== product.id)
       .slice(0, 4);

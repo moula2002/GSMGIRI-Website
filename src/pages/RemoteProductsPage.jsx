@@ -31,9 +31,9 @@ export default function RemoteProductsPage({
   const [selectedCategory, setSelectedCategory] = useState('all');
 
   const getConvertedPrice = (price) => {
-    if (currency === 'INR') return `₹${Number(price).toLocaleString('en-IN')}`;
-    const converted = Math.round(Number(price) / 83);
-    return `$${converted.toLocaleString('en-US')}`;
+    if (currency === 'INR') return `${Number(price).toFixed(2)} INR`;
+    const converted = Number(price) / 83;
+    return `${converted.toFixed(2)} USD`;
   };
 
   // Extract unique categories
@@ -73,48 +73,38 @@ export default function RemoteProductsPage({
   return (
     <section className="max-w-7xl mx-auto px-4 py-8 font-sans">
       {/* Page Header */}
-      <div className="flex items-center gap-4 mb-8 p-6 bg-gradient-to-r from-[#0b192c] to-[#1a3050] rounded-2xl shadow-lg">
-        <div className="w-14 h-14 rounded-2xl bg-cyan-500/20 border border-cyan-400/40 flex items-center justify-center shrink-0">
-          <WrenchIcon className="w-7 h-7 text-cyan-400" />
-        </div>
+      <div className="flex flex-col md:flex-row justify-between mb-8 bg-white p-6 border border-slate-100 shadow-sm rounded-sm">
         <div>
-          <h1 className="text-xl font-black text-white tracking-tight">Remote / Tool-Rent</h1>
-          <p className="text-xs text-slate-400 mt-0.5 font-medium">
-            {remoteProducts.length} tool{remoteProducts.length !== 1 ? 's' : ''} available • Direct from database
-          </p>
+          <h1 className="text-lg font-bold text-slate-800 uppercase tracking-wide">REMOTE SERVICE LIST</h1>
+          <div className="text-sm text-slate-500 mt-1.5 flex items-center gap-2">
+            <span className="hover:text-slate-800 cursor-pointer">Home</span>
+            <span className="text-slate-300">&gt;</span>
+            <span>Remote Service List</span>
+          </div>
         </div>
-        <div className="ml-auto hidden sm:flex items-center gap-2 bg-white/5 border border-white/10 rounded-xl px-4 py-2">
-          <ClockIcon className="w-4 h-4 text-[#d4af37]" />
-          <span className="text-xs text-white font-bold">Instant Activation</span>
-        </div>
-      </div>
-
-      {/* Search & Filter Bar */}
-      <div className="flex flex-col sm:flex-row gap-3 mb-6">
-        <div className="relative flex-1">
-          <SearchIcon className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+        <div className="mt-4 md:mt-0 flex flex-col md:flex-row items-center gap-4">
+          <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-none w-full md:w-auto">
+            {categories.map(cat => (
+              <button
+                key={cat}
+                onClick={() => setSelectedCategory(cat)}
+                className={`whitespace-nowrap px-4 py-2 rounded-md text-xs font-bold uppercase tracking-wider border transition-all ${
+                  selectedCategory === cat
+                    ? 'bg-[#008080] text-white border-[#008080]'
+                    : 'bg-white text-slate-500 border-slate-200 hover:border-[#008080]/40 hover:text-[#008080]'
+                }`}
+              >
+                {cat === 'all' ? 'All Tools' : cat}
+              </button>
+            ))}
+          </div>
           <input
             type="text"
-            placeholder="Search tools by name, duration..."
+            placeholder="Search Service"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="w-full pl-9 pr-4 py-2.5 text-sm border border-slate-200 rounded-xl bg-white focus:outline-none focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500/20 transition-all"
+            className="w-full md:w-64 px-4 py-2.5 text-sm border border-slate-200 rounded-md focus:outline-none focus:border-slate-300"
           />
-        </div>
-        <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-none">
-          {categories.map(cat => (
-            <button
-              key={cat}
-              onClick={() => setSelectedCategory(cat)}
-              className={`whitespace-nowrap px-4 py-2 rounded-xl text-xs font-bold uppercase tracking-wider border transition-all ${
-                selectedCategory === cat
-                  ? 'bg-[#d4af37] text-slate-950 border-[#d4af37]'
-                  : 'bg-white text-slate-500 border-slate-200 hover:border-[#d4af37]/40 hover:text-[#d4af37]'
-              }`}
-            >
-              {cat === 'all' ? 'All Tools' : cat}
-            </button>
-          ))}
         </div>
       </div>
 
@@ -131,81 +121,44 @@ export default function RemoteProductsPage({
           <p className="text-xs text-slate-400 mt-1">Try a different search term or category filter.</p>
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {filtered.map((product) => (
             <div
               key={product.id || product._id}
-              className="bg-white border border-slate-200 rounded-2xl p-5 hover:border-cyan-400/50 hover:shadow-lg transition-all duration-300 group flex flex-col"
+              onClick={() => handleBook(product)}
+              className="bg-white border border-slate-100 rounded-md p-4 hover:border-slate-200 hover:shadow-sm transition-all duration-300 group flex flex-row items-center gap-4 cursor-pointer"
             >
               {/* Product Image or Icon */}
-              <div className="w-full h-36 rounded-xl overflow-hidden mb-4 bg-gradient-to-br from-[#0b192c] to-[#152e50] border border-slate-800/40 flex items-center justify-center shrink-0">
+              <div className="w-20 h-20 md:w-24 md:h-24 rounded-lg overflow-hidden shrink-0 flex items-center justify-center border border-slate-100 bg-[#008080]">
                 {product.image ? (
                   <img
                     src={product.image}
                     alt={product.name}
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                    className="w-full h-full object-cover bg-white"
                   />
                 ) : (
-                  <div className="flex flex-col items-center gap-2">
-                    <div className="w-14 h-14 rounded-xl bg-cyan-500/10 border border-cyan-500/20 flex items-center justify-center">
-                      <WrenchIcon className="w-7 h-7 text-cyan-400" />
-                    </div>
-                    <span className="text-[8px] text-cyan-400 uppercase tracking-widest font-black">TOOL RENT</span>
+                  <div className="flex items-center justify-center w-full h-full text-white">
+                    <svg className="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                      <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
+                      <path d="M8.5 10a1.5 1.5 0 100-3 1.5 1.5 0 000 3z" />
+                      <path d="M21 15l-5-5L5 21" />
+                    </svg>
                   </div>
                 )}
               </div>
 
-              {/* Info */}
-              <div className="flex-1 flex flex-col">
-                {/* Category Badge */}
-                {product.category && (
-                  <span className="inline-block self-start mb-2 px-2.5 py-0.5 rounded-full text-[9px] font-black uppercase tracking-wider bg-cyan-50 text-cyan-700 border border-cyan-200">
-                    {product.category}
-                  </span>
-                )}
-
-                <h3 className="text-sm font-black text-slate-800 group-hover:text-[#d4af37] transition-colors leading-snug mb-2">
+              <div className="flex-1 flex flex-col justify-center">
+                <h3 className="text-[13px] font-medium text-slate-600 uppercase leading-snug mb-3">
                   {product.name}
                 </h3>
 
-                {product.description && (
-                  <p className="text-xs text-slate-500 leading-relaxed mb-3 line-clamp-2">
-                    {product.description}
-                  </p>
-                )}
-
-                {/* Duration & Status Badges */}
-                <div className="flex items-center gap-2 flex-wrap mb-4">
-                  {product.duration && (
-                    <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[9px] font-black uppercase tracking-wider bg-amber-50 text-amber-700 border border-amber-200">
-                      <ClockIcon className="w-2.5 h-2.5" />
-                      {product.duration}
-                    </span>
-                  )}
-                  <span className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[9px] font-black uppercase tracking-wider ${
-                    product.status === 'Active'
-                      ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
-                      : 'bg-slate-100 text-slate-500 border border-slate-200'
-                  }`}>
-                    <span className={`w-1.5 h-1.5 rounded-full ${product.status === 'Active' ? 'bg-emerald-500' : 'bg-slate-400'}`} />
-                    {product.status || 'Active'}
+                <div className="flex flex-wrap items-center gap-2">
+                  <span className="bg-cyan-50 text-teal-600 px-2 py-1 rounded text-[11px] font-bold">
+                    {getConvertedPrice(product.rentalPrice || 0)}
                   </span>
-                </div>
-
-                {/* Price + CTA */}
-                <div className="mt-auto pt-3 border-t border-slate-100 flex items-center justify-between">
-                  <div>
-                    <span className="text-xs text-slate-400 block font-medium">Rental Price</span>
-                    <span className="text-base font-black text-[#d4af37]">
-                      {getConvertedPrice(product.rentalPrice || 0)}
-                    </span>
-                  </div>
-                  <button
-                    onClick={() => handleBook(product)}
-                    className="bg-gradient-to-r from-[#d4af37] to-[#c5a059] hover:from-[#c5a059] hover:to-[#b8923e] text-slate-950 px-4 py-2 rounded-xl text-[11px] font-black uppercase tracking-wider transition-all shadow-sm hover:shadow-md cursor-pointer"
-                  >
-                    Rent Now
-                  </button>
+                  <span className="bg-orange-50 text-orange-400 px-2 py-1 rounded text-[11px] font-bold uppercase">
+                    {product.duration || 'INSTANT'}
+                  </span>
                 </div>
               </div>
             </div>

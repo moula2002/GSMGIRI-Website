@@ -421,6 +421,8 @@ export default function App() {
               <ProductDetail
                 product={selectedProduct}
                 services={services}
+                imeiProducts={imeiProducts}
+                remoteProducts={remoteProducts}
                 setProduct={setSelectedProduct}
                 currency={currency}
                 user={user}
