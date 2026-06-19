@@ -12,6 +12,28 @@ export default function CheckoutPage({ cart = [], user, currency, handleCheckout
 
   const [paymentMethod, setPaymentMethod] = useState('upi');
   const [loading, setLoading] = useState(false);
+  const [fetchedMobile, setFetchedMobile] = useState(user?.mobile || 'N/A');
+
+  useEffect(() => {
+    const fetchUserMobile = async () => {
+      if (user && user.email) {
+        try {
+          const res = await fetch('https://gsmgiri-website-backend.onrender.com/api/data', {
+            headers: { 'x-user-email': user.email }
+          });
+          if (res.ok) {
+            const data = await res.json();
+            if (data.user && data.user.mobile) {
+              setFetchedMobile(data.user.mobile);
+            }
+          }
+        } catch (error) {
+          console.error("Failed to fetch user mobile dynamically:", error);
+        }
+      }
+    };
+    fetchUserMobile();
+  }, [user]);
 
   const getConvertedPrice = (priceINR) => {
     if (currency === 'INR') return priceINR;
@@ -86,7 +108,7 @@ export default function CheckoutPage({ cart = [], user, currency, handleCheckout
               <div>
                 <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">Mobile Number</label>
                 <div className="bg-slate-50 border border-slate-200 px-3 py-2 rounded-lg text-sm text-slate-700 font-medium truncate">
-                  {user.mobile || 'N/A'}
+                  {fetchedMobile !== 'N/A' && fetchedMobile !== '' ? fetchedMobile : (user.mobile || 'N/A')}
                 </div>
               </div>
             </div>
