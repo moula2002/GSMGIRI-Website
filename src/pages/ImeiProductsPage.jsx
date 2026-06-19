@@ -22,7 +22,6 @@ export default function ImeiProductsPage({
   setOpenAuthModal
 }) {
   const [search, setSearch] = useState('');
-  const [selectedCategory, setSelectedCategory] = useState('all');
 
   const getConvertedPrice = (price) => {
     if (currency === 'INR') return `₹${Number(price).toLocaleString('en-IN')}`;
@@ -30,16 +29,11 @@ export default function ImeiProductsPage({
     return `$${converted.toLocaleString('en-US')}`;
   };
 
-  // Extract unique categories
-  const categories = ['all', ...Array.from(new Set(imeiProducts.map(p => p.category).filter(Boolean)))];
-
   const filtered = imeiProducts.filter(p => {
-    const matchCat = selectedCategory === 'all' || p.category === selectedCategory;
     const matchSearch = !search ||
       p.name.toLowerCase().includes(search.toLowerCase()) ||
-      (p.description && p.description.toLowerCase().includes(search.toLowerCase())) ||
-      (p.category && p.category.toLowerCase().includes(search.toLowerCase()));
-    return matchCat && matchSearch;
+      (p.description && p.description.toLowerCase().includes(search.toLowerCase()));
+    return matchSearch;
   });
 
   const handleBook = (product) => {
@@ -53,7 +47,6 @@ export default function ImeiProductsPage({
       title: product.name,
       desc: product.description || '',
       priceINR: product.price || 0,
-      category: product.category || 'imei',
       type: 'IMEI Service',
       processing: 'MINUTES',
       isInstant: true,
@@ -78,7 +71,6 @@ export default function ImeiProductsPage({
         </div>
       </div>
 
-      {/* Search & Filter Bar */}
       <div className="flex flex-col sm:flex-row gap-3 mb-6">
         <div className="relative flex-1">
           <SearchIcon className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
@@ -89,21 +81,6 @@ export default function ImeiProductsPage({
             onChange={(e) => setSearch(e.target.value)}
             className="w-full pl-9 pr-4 py-2.5 text-sm border border-slate-200 rounded-xl bg-white focus:outline-none focus:border-[#d4af37] focus:ring-1 focus:ring-[#d4af37]/30 transition-all"
           />
-        </div>
-        <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-none">
-          {categories.map(cat => (
-            <button
-              key={cat}
-              onClick={() => setSelectedCategory(cat)}
-              className={`whitespace-nowrap px-4 py-2 rounded-xl text-xs font-bold uppercase tracking-wider border transition-all ${
-                selectedCategory === cat
-                  ? 'bg-[#d4af37] text-slate-950 border-[#d4af37]'
-                  : 'bg-white text-slate-500 border-slate-200 hover:border-[#d4af37]/40 hover:text-[#d4af37]'
-              }`}
-            >
-              {cat === 'all' ? 'All' : cat}
-            </button>
-          ))}
         </div>
       </div>
 
@@ -124,7 +101,8 @@ export default function ImeiProductsPage({
           {filtered.map((product) => (
             <div
               key={product.id || product._id}
-              className="bg-white border border-slate-200 rounded-2xl p-5 hover:border-[#d4af37]/50 hover:shadow-lg transition-all duration-300 group flex flex-col"
+              onClick={() => handleBook(product)}
+              className="bg-white border border-slate-200 rounded-2xl p-5 hover:border-[#d4af37]/50 hover:shadow-lg transition-all duration-300 group flex flex-col cursor-pointer"
             >
               {/* Product Image or Icon */}
               <div className="w-full h-36 rounded-xl overflow-hidden mb-4 bg-gradient-to-br from-slate-50 to-slate-100 border border-slate-100 flex items-center justify-center shrink-0">
@@ -144,14 +122,7 @@ export default function ImeiProductsPage({
                 )}
               </div>
 
-              {/* Info */}
               <div className="flex-1 flex flex-col">
-                {/* Category Badge */}
-                {product.category && (
-                  <span className="inline-block self-start mb-2 px-2.5 py-0.5 rounded-full text-[9px] font-black uppercase tracking-wider bg-[#0b192c]/10 text-[#0b192c] border border-[#0b192c]/10">
-                    {product.category}
-                  </span>
-                )}
 
                 <h3 className="text-sm font-black text-slate-800 group-hover:text-[#d4af37] transition-colors leading-snug mb-2">
                   {product.name}
@@ -184,7 +155,6 @@ export default function ImeiProductsPage({
                     </span>
                   </div>
                   <button
-                    onClick={() => handleBook(product)}
                     className="bg-[#d4af37] hover:bg-[#c5a059] text-slate-950 px-4 py-2 rounded-xl text-[11px] font-black uppercase tracking-wider transition-all shadow-sm hover:shadow-md cursor-pointer"
                   >
                     Purchase

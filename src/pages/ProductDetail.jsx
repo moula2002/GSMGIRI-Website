@@ -19,6 +19,9 @@ export default function ProductDetail({
   const navigate = useNavigate();
 
   const [agreed, setAgreed] = useState(true);
+  const [serialNo, setSerialNo] = useState('');
+
+  const isImei = product.type === 'IMEI Service';
 
   // Scroll to top whenever this page is opened
   useEffect(() => {
@@ -155,7 +158,13 @@ export default function ProductDetail({
   const relatedItems = getRelatedServices();
 
   const handlePlaceOrder = () => {
-    onBookService(product);
+    if (isImei && !serialNo.trim()) {
+      alert("Please enter the Serial Number to proceed.");
+      return;
+    }
+    const orderData = { ...product };
+    if (isImei) orderData.serialNo = serialNo.trim();
+    onBookService(orderData);
   };
 
   return (
@@ -232,6 +241,22 @@ export default function ProductDetail({
             </div>
           </div>
 
+          {/* Serial Number Input */}
+          {isImei && (
+            <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm space-y-2 text-left">
+              <label className="text-xs font-black text-slate-800 tracking-wide block">
+                Enter Serial No
+              </label>
+              <input
+                type="text"
+                placeholder="Serial No"
+                value={serialNo}
+                onChange={(e) => setSerialNo(e.target.value)}
+                className="w-full bg-[#F8FAFC] border border-[#008080]/40 focus:border-[#008080] text-sm rounded-lg px-4 py-3.5 text-slate-800 focus:outline-none focus:ring-1 focus:ring-[#008080]/30 transition-all shadow-inner placeholder-slate-400"
+              />
+            </div>
+          )}
+
           {/* Detailed Product Description & Instructions */}
           {product.desc && (
             <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm space-y-4 text-left">
@@ -262,14 +287,14 @@ export default function ProductDetail({
             <div className="flex gap-4">
               <button
                 onClick={handlePlaceOrder}
-                disabled={!agreed}
-                className={`flex-1 font-black py-3.5 rounded-xl text-xs uppercase tracking-wider transition-all shadow flex items-center justify-center gap-2 cursor-pointer border ${
-                  agreed
-                    ? 'bg-[#008080] hover:bg-[#006666] text-white border-[#008080]/35 hover:shadow-md'
+                disabled={!agreed || (isImei && !serialNo.trim())}
+                className={`flex-1 font-black py-3.5 rounded-xl text-xs uppercase tracking-wider transition-all shadow flex items-center justify-center gap-2 border ${
+                  agreed && (!isImei || serialNo.trim())
+                    ? 'bg-[#008080] hover:bg-[#006666] text-white border-[#008080]/35 hover:shadow-md cursor-pointer'
                     : 'bg-slate-100 text-slate-400 border-slate-200 cursor-not-allowed shadow-none'
                 }`}
               >
-                PLACE AN ORDER
+                Continue
               </button>
             </div>
           </div>

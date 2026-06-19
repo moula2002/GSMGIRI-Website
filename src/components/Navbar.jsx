@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { HomeIcon, GlobeIcon, ChevronDownIcon, MenuIcon, XIcon, UserIcon } from './Icons';
+import { HomeIcon, GlobeIcon, ChevronDownIcon, MenuIcon, XIcon, UserIcon, CartIcon } from './Icons';
 import logoImg from '../assets/GSM giri logo.png';
 
 const BookIcon = ({ className = "w-4 h-4" }) => (
@@ -31,6 +31,8 @@ export default function Navbar({
   const navigate = useNavigate();
   const [serviceDropdownOpen, setServiceDropdownOpen] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
+  const cartItemCount = cart?.reduce((total, item) => total + (item.quantity || 1), 0) || 0;
 
 
   const handleHomeClick = () => {
@@ -157,6 +159,19 @@ export default function Navbar({
           {/* Desktop Right Side (Currency & Auth) */}
           <div className="hidden md:flex items-center gap-4">
 
+            {/* Cart Icon */}
+            <button
+              onClick={() => { navigate('/cart'); setMobileMenuOpen(false); }}
+              className="relative p-2 text-white hover:text-white/80 transition-colors cursor-pointer"
+            >
+              <CartIcon className="w-5 h-5" />
+              {cartItemCount > 0 && (
+                <span className="absolute top-0 right-0 inline-flex items-center justify-center px-1.5 py-0.5 text-[9px] font-bold text-white bg-red-600 rounded-full transform translate-x-1 -translate-y-1">
+                  {cartItemCount}
+                </span>
+              )}
+            </button>
+
             {/* User Session */}
             {user ? (
               <div className="relative">
@@ -273,13 +288,28 @@ export default function Navbar({
               <img src={logoImg} alt="GSM GIRI Logo" className="h-11 object-contain mix-blend-screen" />
             </div>
 
-            {/* Hamburger Button */}
-            <button
-              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="inline-flex items-center justify-center p-2 rounded-md text-white hover:bg-white/10 focus:outline-none"
-            >
-              {mobileMenuOpen ? <XIcon className="h-6 w-6" /> : <MenuIcon className="h-6 w-6" />}
-            </button>
+            <div className="flex items-center gap-2">
+              {/* Cart Icon Mobile */}
+              <button
+                onClick={() => { navigate('/cart'); setMobileMenuOpen(false); }}
+                className="relative p-2 text-white hover:text-white/80 transition-colors cursor-pointer"
+              >
+                <CartIcon className="w-5 h-5" />
+                {cartItemCount > 0 && (
+                  <span className="absolute top-0 right-0 inline-flex items-center justify-center px-1.5 py-0.5 text-[9px] font-bold text-white bg-red-600 rounded-full transform translate-x-1 -translate-y-1">
+                    {cartItemCount}
+                  </span>
+                )}
+              </button>
+
+              {/* Hamburger Button */}
+              <button
+                onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+                className="inline-flex items-center justify-center p-2 rounded-md text-white hover:bg-white/10 focus:outline-none cursor-pointer"
+              >
+                {mobileMenuOpen ? <XIcon className="h-6 w-6" /> : <MenuIcon className="h-6 w-6" />}
+              </button>
+            </div>
           </div>
 
         </div>

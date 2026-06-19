@@ -66,7 +66,7 @@ export default function CartPage({
       isCart: true,
       items: cart
     });
-    ('checkout');
+    navigate('/checkout');
   };
 
   // Helper to render thumbnails
@@ -96,7 +96,7 @@ export default function CartPage({
           <h2 className="text-lg font-bold text-slate-700">Your Cart is Empty</h2>
           <p className="text-xs text-slate-400">Add services and tool rentals from the inventory list to checkout.</p>
           <button
-            onClick={() => ('services')}
+            onClick={() => navigate('/services')}
             className="bg-[#d4af37] hover:bg-[#c5a059] text-slate-950 px-6 py-2.5 rounded-xl text-xs font-black uppercase tracking-wider transition-all cursor-pointer border border-[#d4af37]/35 inline-block"
           >
             Browse Services

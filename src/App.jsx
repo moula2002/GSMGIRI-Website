@@ -23,6 +23,7 @@ import TermsOfService from './pages/TermsOfService';
 import DeliveryPolicy from './pages/DeliveryPolicy';
 import CancellationPolicy from './pages/CancellationPolicy';
 import RefundPolicy from './pages/RefundPolicy';
+import CheckoutPage from './pages/CheckoutPage';
 const API_BASE = 'https://gsmgiri-website-backend.onrender.com/api';
 
 export default function App() {
@@ -263,7 +264,7 @@ export default function App() {
     }
   };
 
-  // Booking simulation handler -> redirects directly to Checkout
+  // Booking simulation handler -> redirects directly to Cart
   const onBookService = (service) => {
     // 1. Force Login Check
     if (!user) {
@@ -271,8 +272,43 @@ export default function App() {
       return;
     }
 
+    const exists = cart.find(item => item.id === service.id);
+    let updated;
+    if (exists) {
+      updated = cart.map(item => item.id === service.id ? { ...item, quantity: item.quantity + 1, serialNo: service.serialNo || item.serialNo } : item);
+    } else {
+      updated = [...cart, { ...service, quantity: 1 }];
+    }
+    setCart(updated);
+    localStorage.setItem('gsm_cart', JSON.stringify(updated));
+
     setSelectedProduct(service);
-    navigate('/checkout');
+    navigate('/cart');
+  };
+
+  const handleCheckoutComplete = (checkoutCart, totalAmount) => {
+    const orderId = 'TT-' + Math.floor(Math.random() * 900000 + 100000);
+    const dateObj = new Date();
+    const formattedDate = dateObj.toISOString().split('T')[0];
+    const formattedTime = dateObj.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+
+    const newOrder = {
+      id: orderId,
+      title: `${checkoutCart.length} Item(s) Checkout`,
+      category: 'cart',
+      type: 'Multiple Items',
+      priceINR: totalAmount,
+      client: user.username,
+      clientContact: user.email || 'Direct User',
+      date: formattedDate,
+      time: formattedTime,
+      status: 'Confirmed'
+    };
+
+    setOrders([newOrder, ...orders]);
+    setCart([]);
+    localStorage.removeItem('gsm_cart');
+    setActiveInvoice(newOrder);
   };
 
   // Product detail view selector — tracks which page to go back to
@@ -419,6 +455,14 @@ export default function App() {
               user={user}
               setOpenAuthModal={setOpenAuthModal}
               setSelectedProduct={setSelectedProduct}
+            />
+          } />
+          <Route path="/checkout" element={
+            <CheckoutPage
+              cart={cart}
+              user={user}
+              currency={currency}
+              handleCheckoutComplete={handleCheckoutComplete}
             />
           } />
           <Route path="/dashboard" element={
