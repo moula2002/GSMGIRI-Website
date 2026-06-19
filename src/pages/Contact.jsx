@@ -166,7 +166,7 @@ export default function Contact({ user }) {
                     <option value="UnlockTool Rent">UnlockTool Rent</option>
                     <option value="Android Multi Tool Rent">Android Multi Tool Rent</option>
                     <option value="NexaPro Activation">NexaPro Activation</option>
-                    <option value="USDT/Wallet Deposit">USDT/Wallet Deposit</option>
+                    <option value="USDT Deposit">USDT Deposit</option>
                   </select>
                 </div>
                 <div className="space-y-1.5 text-left">

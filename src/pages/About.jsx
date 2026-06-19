@@ -44,7 +44,7 @@ export default function About() {
               </li>
               <li className="flex items-start gap-2">
                 <span className="text-[#d4af37] font-bold">✔</span>
-                <span><strong>Secure Deposits:</strong> Fast wallet replenishment via bank wire, credit card gateways, and USDT crypto channels.</span>
+                <span><strong>Secure Payments:</strong> Fast payments via bank wire, credit card gateways, and USDT crypto channels.</span>
               </li>
               <li className="flex items-start gap-2">
                 <span className="text-[#d4af37] font-bold">✔</span>

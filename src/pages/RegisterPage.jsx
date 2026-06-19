@@ -2,7 +2,7 @@ import { useNavigate } from 'react-router-dom';
 import React, { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { register as registerApi } from '../services/authService';
-import { UserIcon, KeyIcon, WalletIcon } from '../components/common/Icons';
+import { UserIcon, KeyIcon } from '../components/common/Icons';
 import logoImg from '../assets/GSM giri logo.png';
 
 export default function RegisterPage({ }) {
@@ -72,7 +72,7 @@ export default function RegisterPage({ }) {
             <label className="block text-[11px] font-bold text-slate-400 uppercase tracking-wide">Enter Company/Shop Name</label>
             <div className="relative">
               <span className="absolute inset-y-0 left-0 flex items-center pl-3.5 pointer-events-none">
-                <WalletIcon className="w-4 h-4 text-slate-400" />
+
               </span>
               <input
                 type="text"

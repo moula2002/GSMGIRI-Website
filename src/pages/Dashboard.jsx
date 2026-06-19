@@ -6,47 +6,12 @@ export default function Dashboard({
   user,
   setUser,
   currency,
-  balance,
-  orders = [],
-  
-  usersList = [],
-  onAdminAddFunds
+  orders = []
 }) {
   const navigate = useNavigate();
 
   const [subTab, setSubTab] = useState('dashboard');
 
-  // Manage Users Search/Fund States
-  const [searchTerm, setSearchTerm] = useState('');
-  const [fundAmounts, setFundAmounts] = useState({});
-  const [loadingEmail, setLoadingEmail] = useState(null);
-  const [actionStatus, setActionStatus] = useState({ type: '', message: '' });
-
-  const handleAddFundsSubmit = async (e, targetEmail, targetCurrency) => {
-    e.preventDefault();
-    const amountStr = fundAmounts[targetEmail];
-    const amount = parseFloat(amountStr);
-    if (isNaN(amount) || amount <= 0) {
-      setActionStatus({ type: 'error', message: 'Please enter a valid positive amount.' });
-      return;
-    }
-
-    setLoadingEmail(targetEmail);
-    setActionStatus({ type: '', message: '' });
-
-    const success = await onAdminAddFunds(targetEmail, amount);
-    setLoadingEmail(null);
-
-    if (success) {
-      setActionStatus({ 
-        type: 'success', 
-        message: `Successfully added ${targetCurrency === 'USD' ? '$' : '₹'}${amount.toFixed(2)} to ${targetEmail}!` 
-      });
-      setFundAmounts(prev => ({ ...prev, [targetEmail]: '' }));
-    } else {
-      setActionStatus({ type: 'error', message: 'Failed to add funds. Please try again.' });
-    }
-  };
 
   // Profile Form States
   const [username, setUsername] = useState(user?.username || '');
@@ -110,11 +75,6 @@ export default function Dashboard({
   const rejectedOrders = orders.filter(o => o.status === 'Cancelled' || o.status === 'Refunded' || o.status === 'Rejected').length;
   const totalOrders = orders.length;
 
-  const currentBalance = balance;
-  const formatVal = (val) => {
-    return val.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-  };
-
   const handleProfileUpdate = async (e) => {
     e.preventDefault();
     setProfileMessage(null);
@@ -159,21 +119,6 @@ export default function Dashboard({
               { id: 'email', label: 'Email Notification', icon: <BellIcon /> }
             ];
 
-            if (user && user.role === 'admin') {
-              sidebarTabs.push({
-                id: 'manage-users',
-                label: 'Manage Users',
-                icon: (
-                  <svg className="w-4.5 h-4.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
-                    <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
-                    <circle cx="9" cy="7" r="4" />
-                    <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
-                    <path d="M16 3.13a4 4 0 0 1 0 7.75" />
-                  </svg>
-                )
-              });
-            }
-
             return sidebarTabs.map(tab => {
               const isActive = subTab === tab.id;
               return (
@@ -201,46 +146,8 @@ export default function Dashboard({
           {subTab === 'dashboard' && (
             <div className="space-y-6">
               
-              {/* Top Row: Balance Card & Status Grid */}
-              <div className="grid grid-cols-1 xl:grid-cols-5 gap-6 items-start">
-                
-                {/* Available Balance Card (3 cols) */}
-                <div className="xl:col-span-3 bg-[#008080] rounded-3xl p-6 sm:p-8 text-white relative overflow-hidden shadow-lg flex flex-col justify-between min-h-[300px]">
-                  {/* Decorative background shape */}
-                  <div className="absolute top-0 right-0 w-32 h-32 rounded-full bg-white/5 -translate-y-12 translate-x-12"></div>
-                  
-                  <div>
-                    <span className="text-xs uppercase tracking-wider text-white/80 font-bold block mb-1">
-                      Available Balance
-                    </span>
-                    <h2 className="text-3xl sm:text-4xl font-black tracking-tight leading-none block">
-                      {formatVal(currentBalance)} ₹ (INR)
-                    </h2>
-                  </div>
-
-                  {/* Inner locked and total balance grid */}
-                  <div className="grid grid-cols-2 gap-4 mt-6">
-                    <div className="bg-white/10 rounded-2xl p-4 border border-white/10">
-                      <span className="text-[10px] uppercase font-bold text-white/75 block">Locked Balance</span>
-                      <span className="text-lg font-black block mt-1">0.00 ₹</span>
-                    </div>
-                    <div className="bg-white/10 rounded-2xl p-4 border border-white/10">
-                      <span className="text-[10px] uppercase font-bold text-white/75 block">Total Receipts</span>
-                      <span className="text-lg font-black block mt-1">6,287.28 ₹</span>
-                    </div>
-                  </div>
-
-                  {/* Add balance action trigger button */}
-                  <button
-                    onClick={() => ('wallet')}
-                    className="w-full bg-[#006666]/30 hover:bg-[#006666]/50 border border-white/20 text-white font-bold py-3.5 rounded-2xl transition-all mt-6 flex items-center justify-center gap-2 cursor-pointer shadow-inner text-sm"
-                  >
-                    <span>+</span> Add Balance
-                  </button>
-                </div>
-
-                {/* Status Grid (2 cols) */}
-                <div className="xl:col-span-2 grid grid-cols-2 gap-4">
+              {/* Top Row: Status Grid */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                   {/* Waiting */}
                   <div className="bg-[#4B5563]/10 hover:bg-[#4B5563]/15 rounded-3xl p-5 border border-slate-200/50 text-left flex items-center gap-4 transition-all">
                     <div className="w-12 h-12 rounded-2xl bg-[#4B5563]/15 flex items-center justify-center text-[#4B5563] shrink-0 font-bold text-lg">
@@ -305,8 +212,6 @@ export default function Dashboard({
                   </div>
 
                 </div>
-
-              </div>
 
               {/* Bottom Row: Invoices and Statements Tables */}
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 pt-2">
@@ -525,121 +430,6 @@ export default function Dashboard({
             </div>
           )}
 
-          {/* 8. MANAGE USERS VIEW (ADMIN ONLY) */}
-          {subTab === 'manage-users' && user?.role === 'admin' && (
-            <div className="bg-white border border-slate-200/60 rounded-3xl p-6 sm:p-8 shadow-sm">
-              <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-b border-slate-100 pb-4 mb-6">
-                <div>
-                  <h2 className="text-lg font-black uppercase tracking-wider text-slate-800">Manage Users & Wallets</h2>
-                  <p className="text-xs text-slate-500 mt-1">Add funds to user wallets. Enforces registered wallet currencies.</p>
-                </div>
-                <div className="w-full sm:w-64">
-                  <input
-                    type="text"
-                    placeholder="Search users..."
-                    value={searchTerm}
-                    onChange={e => setSearchTerm(e.target.value)}
-                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs text-slate-800 focus:outline-none focus:border-[#008080]"
-                  />
-                </div>
-              </div>
-
-              {actionStatus.message && (
-                <div className={`p-3.5 rounded-xl text-xs font-bold mb-5 flex items-center gap-2 ${
-                  actionStatus.type === 'success' 
-                    ? 'bg-emerald-50 border border-emerald-200 text-emerald-700' 
-                    : 'bg-red-50 border border-red-200 text-red-700'
-                }`}>
-                  {actionStatus.type === 'success' ? '✓' : '⚠️'} {actionStatus.message}
-                </div>
-              )}
-
-              <div className="overflow-x-auto -mx-6 sm:mx-0">
-                <table className="w-full text-xs text-left border-collapse min-w-[600px]">
-                  <thead>
-                    <tr className="border-b border-slate-100 text-slate-400 font-bold uppercase tracking-wider text-[10px]">
-                      <th className="py-3 px-4">User</th>
-                      <th className="py-3 px-4">Company</th>
-                      <th className="py-3 px-4">Currency</th>
-                      <th className="py-3 px-4">Balance</th>
-                      <th className="py-3 px-4 text-right">Add Funds</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-slate-100">
-                    {(() => {
-                      const filteredUsers = usersList.filter(u => 
-                        u.username.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                        u.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                        (u.company && u.company.toLowerCase().includes(searchTerm.toLowerCase()))
-                      );
-
-                      if (filteredUsers.length === 0) {
-                        return (
-                          <tr>
-                            <td colSpan="5" className="py-8 text-center text-slate-400 font-medium">
-                              No users found matching the query.
-                            </td>
-                          </tr>
-                        );
-                      }
-
-                      return filteredUsers.map(u => {
-                        const curSymbol = u.currency === 'USD' ? '$' : '₹';
-                        const curColor = u.currency === 'USD' 
-                          ? 'bg-amber-50 text-amber-600 border border-amber-200' 
-                          : 'bg-cyan-50 text-cyan-600 border border-cyan-200';
-                        return (
-                          <tr key={u.email} className="hover:bg-slate-50/40 transition-colors">
-                            <td className="py-4 px-4">
-                              <div className="font-bold text-slate-850">{u.username}</div>
-                              <div className="text-[10px] text-slate-400 font-medium mt-0.5">{u.email}</div>
-                              {u.role === 'admin' && (
-                                <span className="inline-block bg-slate-100 text-slate-600 text-[9px] font-black px-1.5 py-0.5 rounded mt-1">ADMIN</span>
-                              )}
-                            </td>
-                            <td className="py-4 px-4 text-slate-600 font-medium">
-                              {u.company || 'GSM GIRI B2B'}
-                            </td>
-                            <td className="py-4 px-4">
-                              <span className={`text-[10px] font-black tracking-wider px-2.5 py-0.5 rounded-lg uppercase ${curColor}`}>
-                                {u.currency}
-                              </span>
-                            </td>
-                            <td className="py-4 px-4 font-black text-slate-800 text-sm">
-                              {curSymbol}{u.balance.toLocaleString('en-IN', { minimumFractionDigits: 2 })}
-                            </td>
-                            <td className="py-4 px-4 text-right">
-                              <form onSubmit={e => handleAddFundsSubmit(e, u.email, u.currency)} className="inline-flex items-center gap-2">
-                                <div className="relative">
-                                  <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 font-bold text-[11px]">{curSymbol}</span>
-                                  <input
-                                    type="number"
-                                    step="0.01"
-                                    required
-                                    placeholder="Amount"
-                                    value={fundAmounts[u.email] || ''}
-                                    onChange={e => setFundAmounts(prev => ({ ...prev, [u.email]: e.target.value }))}
-                                    className="w-24 bg-slate-50 border border-slate-200 rounded-xl pl-6 pr-3 py-2 text-xs focus:outline-none focus:border-[#008080] font-bold text-slate-800"
-                                  />
-                                </div>
-                                <button
-                                  type="submit"
-                                  disabled={loadingEmail === u.email}
-                                  className="bg-[#008080] hover:bg-[#006666] text-white font-bold px-3.5 py-2 rounded-xl transition-all border border-[#008080]/30 cursor-pointer disabled:opacity-55 disabled:cursor-not-allowed"
-                                >
-                                  {loadingEmail === u.email ? 'Adding...' : 'Add'}
-                                </button>
-                              </form>
-                            </td>
-                          </tr>
-                        );
-                      });
-                    })()}
-                  </tbody>
-                </table>
-              </div>
-            </div>
-          )}
 
         </div>
 

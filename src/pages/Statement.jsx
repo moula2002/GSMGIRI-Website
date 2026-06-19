@@ -28,7 +28,7 @@ export default function Statement({ orders = [], balance = 0, currency }) {
       id: o.id,
       dateTime: `${o.date} ${o.time || '00:00'}`,
       description: isCredit 
-        ? (o.title || 'Balance added to Wallet')
+        ? (o.title || 'Order Payment')
         : (o.title || 'Place Order (Web)'),
       type: isCredit ? 'CREDIT' : 'DEBIT',
       amount: amountVal,

@@ -1,6 +1,6 @@
 import React from 'react';
 import { useLocation, Link } from 'react-router-dom';
-import { WhatsappIcon, TelegramIcon, ShieldIcon, ZapIcon, HeadphonesIcon, WalletIcon } from './Icons';
+import { WhatsappIcon, TelegramIcon, ShieldIcon, ZapIcon, HeadphonesIcon } from './Icons';
 
 function ClientCard({ client }) {
   const bgClass = client.bgColor || 'bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 border border-slate-700/60';
@@ -125,16 +125,6 @@ export default function Footer({ currency, clients = [] }) {
               <div>
                 <span className="block text-white text-xs font-bold uppercase tracking-wider">24/7 Support</span>
                 <span className="text-[10px] text-slate-400">Always here to help you</span>
-              </div>
-            </div>
-
-            <div className="flex flex-col sm:flex-row items-center gap-3.5">
-              <div className="w-10 h-10 rounded-lg bg-[#0b192c]/60 border border-slate-800/80 flex items-center justify-center text-[#d4af37] shrink-0">
-                <WalletIcon className="w-5 h-5 text-[#d4af37]" />
-              </div>
-              <div>
-                <span className="block text-white text-xs font-bold uppercase tracking-wider">Easy Recharge</span>
-                <span className="text-[10px] text-slate-400">Binance, Tether, Visa & more</span>
               </div>
             </div>
 

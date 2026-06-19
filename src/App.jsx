@@ -6,11 +6,10 @@ import Home from './pages/Home';
 import Services from './pages/Services';
 import CategoryServices from './pages/CategoryServices';
 import ProductDetail from './pages/ProductDetail';
-import Wallet from './pages/Wallet';
 import History from './pages/History';
 import Footer from './components/Footer';
 import Modals from './components/Modals';
-import { GlobeIcon, KeyIcon, WalletIcon } from './components/Icons';
+import { GlobeIcon, KeyIcon } from './components/Icons';
 import dashboardImg from './assets/dashboard.png';
 import About from './pages/About';
 import Contact from './pages/Contact';
@@ -37,7 +36,6 @@ export default function App() {
 
   const [currency, setCurrency] = useState('INR');
   const [language, setLanguage] = useState('EN');
-  const [balance, setBalance] = useState(0);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedProduct, setSelectedProduct] = useState(null);
 
@@ -76,25 +74,6 @@ export default function App() {
     }
   };
 
-  const onAdminAddFunds = async (targetUserEmail, amount) => {
-    if (!user || user.role !== 'admin') return false;
-    try {
-      const response = await fetch(`${API_BASE}/admin/users/add-funds`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: targetUserEmail, amount })
-      });
-      if (response.ok) {
-        fetchUsersList();
-        return true;
-      }
-      return false;
-    } catch (error) {
-      console.error('Admin adding funds failed:', error);
-      return false;
-    }
-  };
-
   // Cart & Wishlist States
   const [cart, setCart] = useState(() => {
     try {
@@ -112,7 +91,7 @@ export default function App() {
 
   // Guard protected tabs & redirect guests to login modal
   useEffect(() => {
-    const protectedPaths = ['/checkout', '/wallet', '/history', '/dashboard', '/statement'];
+    const protectedPaths = ['/checkout', '/history', '/dashboard', '/statement'];
     if (protectedPaths.some(p => location.pathname.startsWith(p)) && !user) {
       navigate('/');
       setOpenAuthModal(true);
@@ -146,7 +125,6 @@ export default function App() {
         const response = await fetch(`${API_BASE}/data`, { headers });
         if (response.ok) {
           const data = await response.json();
-          if (data.balance !== undefined) setBalance(data.balance);
           if (data.orders) setOrders(data.orders);
         }
         if (user && user.role === 'admin') {
@@ -262,8 +240,6 @@ export default function App() {
   // Modal display states
   const [openAuthModal, setOpenAuthModal] = useState(false);
   const [activeInvoice, setActiveInvoice] = useState(null);
-  const [fundSuccessData, setFundSuccessData] = useState(null);
-  const [insufficientFundsData, setInsufficientFundsData] = useState(null);
   const [productBackTab, setProductBackTab] = useState('services');
 
   // Authentication Handlers
@@ -287,42 +263,7 @@ export default function App() {
     }
   };
 
-  // Wallet Funding simulation handler
-  const onAddFunds = async (amountINR, method) => {
-    if (!user || !user.email) {
-      setOpenAuthModal(true);
-      return;
-    }
-    try {
-      const response = await fetch(`${API_BASE}/balance/add`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ amount: amountINR, method, email: user.email })
-      });
-      if (response.ok) {
-        const data = await response.json();
-        setBalance(data.balance);
-
-        // Reload all data to ensure orders/transactions sync
-        const headers = { 'x-user-email': user.email };
-        const dataRes = await fetch(`${API_BASE}/data`, { headers });
-        if (dataRes.ok) {
-          const fullData = await dataRes.json();
-          setOrders(fullData.orders);
-        }
-        setFundSuccessData({ amount: amountINR, method, txId: data.transaction.txId });
-
-        // If there was a selected product, redirect directly to Checkout after success modal dismisses
-        setTimeout(() => {
-          navigate('/checkout');
-        }, 3000);
-      }
-    } catch (error) {
-      console.error('Adding funds failed:', error);
-    }
-  };
-
-  // Booking simulation handler -> redirects directly to Wallet (INR Fund Add)
+  // Booking simulation handler -> redirects directly to Checkout
   const onBookService = (service) => {
     // 1. Force Login Check
     if (!user) {
@@ -331,7 +272,7 @@ export default function App() {
     }
 
     setSelectedProduct(service);
-    navigate('/wallet');
+    navigate('/checkout');
   };
 
   // Product detail view selector — tracks which page to go back to
@@ -355,7 +296,6 @@ export default function App() {
       <Navbar
         currency={currency}
         setCurrency={setCurrency}
-        balance={balance}
         user={user}
         setOpenAuthModal={setOpenAuthModal}
         handleLogout={handleLogout}
@@ -460,14 +400,6 @@ export default function App() {
               <Navigate to="/services" />
             )
           } />
-          <Route path="/wallet" element={
-            <Wallet
-              currency={currency}
-              balance={balance}
-              onAddFunds={onAddFunds}
-              prefilledAmount={selectedProduct ? Math.ceil(selectedProduct.priceINR) : null}
-            />
-          } />
           <Route path="/history" element={
             <History
               orders={orders}
@@ -494,19 +426,15 @@ export default function App() {
               user={user}
               setUser={setUser}
               currency={currency}
-              balance={balance}
               orders={orders}
               services={services}
               wishlist={wishlist}
               setWishlist={setWishlist}
-              usersList={usersList}
-              onAdminAddFunds={onAdminAddFunds}
             />
           } />
           <Route path="/statement" element={
             <Statement
               orders={orders}
-              balance={balance}
               currency={currency}
             />
           } />
@@ -538,10 +466,6 @@ export default function App() {
         handleLoginSubmit={handleLoginSubmit}
         activeInvoice={activeInvoice}
         setActiveInvoice={setActiveInvoice}
-        fundSuccessData={fundSuccessData}
-        setFundSuccessData={setFundSuccessData}
-        insufficientFundsData={insufficientFundsData}
-        setInsufficientFundsData={setInsufficientFundsData}
       />
     </div>
   );

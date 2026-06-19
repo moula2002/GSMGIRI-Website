@@ -12,17 +12,12 @@ export default function RefundPolicy() {
 
         <h2 className="text-xl font-bold text-slate-800 mt-8 mb-3">Service Failures</h2>
         <p>
-          If a digital service (such as an IMEI unlock or server request) fails to process successfully or is rejected by the supplier, the full amount deducted for that service will be automatically refunded to your GSM GIRI wallet balance.
+          If a digital service (such as an IMEI unlock or server request) fails to process successfully or is rejected by the supplier, the full amount deducted for that service will be automatically refunded to your original payment method.
         </p>
         
         <h2 className="text-xl font-bold text-slate-800 mt-8 mb-3">Incorrect Submissions</h2>
         <p>
           <strong>No refunds</strong> will be provided for orders submitted with incorrect information, such as a wrong IMEI number, incorrect carrier selection, or wrong device model. Please verify all details before placing an order.
-        </p>
-
-        <h2 className="text-xl font-bold text-slate-800 mt-8 mb-3">Wallet Withdrawals</h2>
-        <p>
-          Funds deposited into your GSM GIRI wallet are generally non-refundable to the original payment method and must be used for services on the platform. Exceptions are made only in specific circumstances at the discretion of management.
         </p>
 
         <h2 className="text-xl font-bold text-slate-800 mt-8 mb-3">Verification Video Requirements</h2>

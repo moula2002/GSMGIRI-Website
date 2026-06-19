@@ -1,6 +1,6 @@
 import { useNavigate } from 'react-router-dom';
 import React, { useState } from 'react';
-import { UserIcon, KeyIcon, GlobeIcon, WalletIcon } from '../components/Icons';
+import { UserIcon, KeyIcon, GlobeIcon } from '../components/Icons';
 
 export default function Login({ handleLoginSubmit, }) {
   const navigate = useNavigate();
@@ -118,7 +118,7 @@ export default function Login({ handleLoginSubmit, }) {
                 <label className="block text-[11px] font-bold text-slate-400 uppercase tracking-wide">Enter Company/Shop Name</label>
                 <div className="relative">
                   <span className="absolute inset-y-0 left-0 flex items-center pl-3.5 pointer-events-none">
-                    <WalletIcon className="w-4 h-4 text-slate-400" />
+
                   </span>
                   <input
                     type="text"

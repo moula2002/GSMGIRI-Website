@@ -261,7 +261,7 @@ export default function History({ orders, currency, onViewInvoice, user, setOrde
                             <option value="Refunded">Refunded</option>
                           </select>
                           <span className="text-[9px] font-extrabold uppercase text-slate-400">
-                            {order.paymentMethod || 'Wallet'}
+                            {order.paymentMethod || 'Direct'}
                           </span>
                         </div>
                       ) : (
@@ -274,7 +274,7 @@ export default function History({ orders, currency, onViewInvoice, user, setOrde
                             {order.paymentStatus || 'Paid'}
                           </span>
                           <span className="text-[9px] font-extrabold uppercase text-slate-400">
-                            {order.paymentMethod || 'Wallet'}
+                            {order.paymentMethod || 'Direct'}
                           </span>
                         </div>
                       )}

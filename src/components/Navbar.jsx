@@ -14,7 +14,6 @@ const BookIcon = ({ className = "w-4 h-4" }) => (
 export default function Navbar({
   currency,
   setCurrency,
-  balance,
   user,
   setOpenAuthModal,
   handleLogout,
@@ -33,14 +32,6 @@ export default function Navbar({
   const [serviceDropdownOpen, setServiceDropdownOpen] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
-  // Helper to format currency
-  const formatBalance = () => {
-    if (currency === 'INR') {
-      return `₹${balance.toLocaleString('en-IN', { minimumFractionDigits: 2 })}`;
-    }
-    const converted = balance / 83;
-    return `$${converted.toLocaleString('en-US', { minimumFractionDigits: 2 })}`;
-  };
 
   const handleHomeClick = () => {
     if (setSearchQuery) setSearchQuery('');
@@ -66,10 +57,6 @@ export default function Navbar({
     setMobileMenuOpen(false);
   };
 
-  const handleWalletClick = () => {
-    navigate('/wallet');
-    setMobileMenuOpen(false);
-  };
 
   const handleHistoryClick = () => {
     navigate('/history');
@@ -155,15 +142,6 @@ export default function Navbar({
               <span>Remote/ Tool-Rent</span>
             </button>
 
-            {/* INR Fund Add */}
-            <button
-              onClick={() => user ? handleWalletClick() : setOpenAuthModal(true)}
-              className={`flex items-center gap-1.5 text-sm font-semibold transition-all py-2 text-white hover:text-white/80 cursor-pointer ${
-                location.pathname === '/wallet' ? 'opacity-100 font-bold border-b-2 border-white' : 'opacity-95'
-              }`}
-            >
-              <span>INR Fund Add</span>
-            </button>
 
             {/* Order history */}
             <button
@@ -207,8 +185,6 @@ export default function Navbar({
                     <span className="text-xs font-bold text-white leading-none">{user.username}</span>
                     <span className="text-[8px] font-black text-white/70 tracking-wider uppercase mt-1">{user.role === 'agent' ? 'CUSTOMER' : (user.role || 'CUSTOMER')}</span>
                   </div>
-                  <div className="h-6 w-px bg-white/20 mx-1.5 self-center shrink-0"></div>
-                  <span className="text-xs font-extrabold text-white shrink-0">{formatBalance()}</span>
                   <ChevronDownIcon className="w-3.5 h-3.5 text-white/80 shrink-0 ml-0.5" />
                 </button>
 
@@ -274,18 +250,6 @@ export default function Navbar({
                         <span>Invoice</span>
                       </button>
 
-                      {/* Add Balance */}
-                      <button
-                        onClick={() => { navigate('/wallet'); setDropdownOpen(false); }}
-                        className="flex items-center gap-4 w-full text-left px-4 py-3 rounded-xl text-sm font-medium text-slate-700 hover:bg-slate-50 transition-colors cursor-pointer"
-                      >
-                        <svg className="w-5 h-5 text-slate-700 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75">
-                          <circle cx="12" cy="12" r="9" strokeDasharray="3 3" />
-                          <line x1="12" y1="8" x2="12" y2="16" strokeLinecap="round" />
-                          <line x1="8" y1="12" x2="16" y2="12" strokeLinecap="round" />
-                        </svg>
-                        <span>Add Balance</span>
-                      </button>
 
                       {/* Divider */}
                       <div className="border-t border-dashed border-slate-200 my-1.5 mx-1"></div>
@@ -376,12 +340,6 @@ export default function Navbar({
             Remote/ Tool-Rent
           </button>
 
-          <button
-            onClick={() => { if (user) handleWalletClick(); else setOpenAuthModal(true); setMobileMenuOpen(false); }}
-            className="text-left w-full px-3 py-2 rounded-md text-sm font-semibold text-white hover:bg-white/10"
-          >
-            INR Fund Add
-          </button>
 
           <button
             onClick={() => { if (user) handleHistoryClick(); else setOpenAuthModal(true); setMobileMenuOpen(false); }}
@@ -411,7 +369,7 @@ export default function Navbar({
             {user ? (
               <div className="flex items-center justify-between px-3">
                 <span className="text-xs font-semibold text-white truncate max-w-[180px]">
-                  {user.username} ({formatBalance()})
+                  {user.username}
                 </span>
                 <button
                   onClick={() => {

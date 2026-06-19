@@ -1,6 +1,6 @@
 import { useNavigate } from 'react-router-dom';
 import React, { useState } from 'react';
-import { XIcon, ShieldIcon, GlobeIcon, WalletIcon, UserIcon, KeyIcon } from './Icons';
+import { XIcon, ShieldIcon, GlobeIcon, UserIcon, KeyIcon } from './Icons';
 
 // Custom SVG Icons matching user's form inputs
 const MailIcon = ({ className = "w-5 h-5" }) => (
@@ -39,10 +39,6 @@ export default function Modals({
   handleLoginSubmit,
   activeInvoice,
   setActiveInvoice,
-  fundSuccessData,
-  setFundSuccessData,
-  insufficientFundsData,
-  setInsufficientFundsData,
   activeTab,
   }) {
   const navigate = useNavigate();
@@ -496,96 +492,7 @@ export default function Modals({
         );
       })()}
 
-      {/* 3. WALLET REPLENISHMENT SUCCESS SPLASH */}
-      {fundSuccessData && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/80 backdrop-blur-md px-4">
-          <div className="w-full max-w-sm bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-2xl p-6 text-center animate-scale-up text-slate-800">
-            
-            <div className="w-14 h-14 rounded-full bg-emerald-50 border border-emerald-200 flex items-center justify-center mx-auto mb-4 text-emerald-600 text-2xl font-bold animate-pulse">
-              ✓
-            </div>
 
-            <h2 className="text-lg font-bold text-slate-800 tracking-tight">Funds Deposited Successfully!</h2>
-            <p className="text-xs text-slate-500 mt-1">Your agency wallet has been credited with net-rate funds.</p>
-
-            <div className="bg-slate-50 border border-slate-200 rounded-xl p-4 my-5 text-xs text-left space-y-2">
-              <div className="flex justify-between">
-                <span className="text-slate-400">Method:</span>
-                <span className="font-bold text-slate-700 capitalize">{fundSuccessData.method} Deposit</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-slate-400">Amount Credited:</span>
-                <span className="font-bold text-[#d4af37]">₹{fundSuccessData.amount.toLocaleString('en-IN')}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-slate-400">Transaction ID:</span>
-                <span className="font-mono text-slate-700 font-semibold">{fundSuccessData.txId}</span>
-              </div>
-            </div>
-
-            <button
-              onClick={() => setFundSuccessData(null)}
-              className="w-full bg-[#d4af37] hover:bg-[#c5a059] text-slate-950 font-black py-2.5 rounded-lg text-xs transition-colors cursor-pointer border border-[#d4af37]/30"
-            >
-              Continue
-            </button>
-          </div>
-        </div>
-      )}
-
-      {/* 4. GENERAL INSUFFICIENT FUNDS MODAL */}
-      {insufficientFundsData && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/80 backdrop-blur-md px-4">
-          <div className="w-full max-w-sm bg-white border border-red-200 rounded-2xl overflow-hidden shadow-2xl p-6 text-center animate-scale-up text-slate-805">
-            
-            <div className="w-14 h-14 rounded-full bg-red-50 border border-red-200 flex items-center justify-center mx-auto mb-4 text-red-600 text-xl font-bold">
-              ⚠
-            </div>
-
-            <h2 className="text-lg font-bold text-slate-800 tracking-tight">Insufficient Wallet Funds</h2>
-            <p className="text-xs text-slate-500 mt-1">
-              Your current wallet balance is insufficient to complete the booking for:
-            </p>
-            <p className="text-xs font-bold text-slate-800 mt-1 italic leading-tight">
-              "{insufficientFundsData.title}"
-            </p>
-
-            <div className="bg-slate-50 border border-slate-200 rounded-xl p-4 my-5 text-xs text-left space-y-2">
-              <div className="flex justify-between">
-                <span className="text-slate-400">Service Price:</span>
-                <span className="font-bold text-slate-700">₹{insufficientFundsData.priceINR.toLocaleString('en-IN')}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-slate-400">Current Wallet:</span>
-                <span className="font-bold text-red-650">₹{insufficientFundsData.currentBalance.toLocaleString('en-IN')}</span>
-              </div>
-              <div className="flex justify-between border-t border-slate-200 pt-2 font-bold">
-                <span className="text-slate-500">Deficit Required:</span>
-                <span className="text-[#d4af37]">₹{(insufficientFundsData.priceINR - insufficientFundsData.currentBalance).toLocaleString('en-IN')}</span>
-              </div>
-            </div>
-
-            <div className="flex gap-3">
-              <button
-                onClick={() => setInsufficientFundsData(null)}
-                className="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-750 py-2.5 rounded-lg text-xs font-bold transition-all"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={() => {
-                  setInsufficientFundsData(null);
-                  ('wallet');
-                }}
-                className="flex-1 bg-[#d4af37] hover:bg-[#c5a059] text-slate-950 font-black py-2.5 rounded-lg text-xs transition-all flex items-center justify-center gap-1.5 shadow-sm border border-[#d4af37]/30 cursor-pointer"
-              >
-                <WalletIcon className="w-4 h-4 text-white" />
-                Add Funds
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
     </>
   );
 }
