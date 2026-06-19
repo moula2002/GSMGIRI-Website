@@ -156,20 +156,6 @@ export default function Navbar({
 
           {/* Desktop Right Side (Currency & Auth) */}
           <div className="hidden md:flex items-center gap-4">
-            {/* Currency Select */}
-            <div className="relative">
-              <select
-                value={currency}
-                onChange={(e) => setCurrency && setCurrency(e.target.value)}
-                className="appearance-none bg-white/5 hover:bg-white/10 border border-white/20 rounded-xl px-4 py-1.5 pr-8 text-sm font-semibold text-white cursor-pointer outline-none hover:border-white/40 focus:border-white transition-all font-sans"
-              >
-                <option value="USD" className="bg-[#0b192c] text-white font-bold">USD</option>
-                <option value="INR" className="bg-[#0b192c] text-white font-bold">INR</option>
-              </select>
-              <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2.5 text-white/80">
-                <ChevronDownIcon className="w-3.5 h-3.5" />
-              </div>
-            </div>
 
             {/* User Session */}
             {user ? (
@@ -349,21 +335,6 @@ export default function Navbar({
           </button>
 
           <div className="border-t border-white/10 pt-3 pb-1 flex flex-col gap-3">
-            {/* Mobile Currency Select */}
-            <div className="flex items-center justify-between px-3">
-              <span className="text-xs font-semibold text-white/80">Currency:</span>
-              <select
-                value={currency}
-                onChange={(e) => {
-                  if (setCurrency) setCurrency(e.target.value);
-                  setMobileMenuOpen(false);
-                }}
-                className="bg-white/10 border border-white/20 rounded px-2.5 py-1 text-xs font-semibold text-white outline-none"
-              >
-                <option value="USD" className="bg-[#0b192c] text-white">USD ($)</option>
-                <option value="INR" className="bg-[#0b192c] text-white">INR (₹)</option>
-              </select>
-            </div>
 
             {/* Mobile Auth Session */}
             {user ? (
