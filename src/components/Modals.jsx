@@ -243,30 +243,7 @@ export default function Modals({
                 </div>
               </div>
 
-              {/* Currency Dropdown (Register only) */}
-              {authTab === 'register' && (
-                <div className="space-y-1.5 text-left">
-                  <label className="block text-xs font-bold text-slate-750">Enter Your Currency</label>
-                  <div className="relative">
-                    <span className="absolute inset-y-0 left-0 flex items-center pl-3.5 pointer-events-none text-slate-400">
-                      <DollarIcon className="w-4 h-4 text-slate-400" />
-                    </span>
-                    <select
-                      value={currency}
-                      onChange={(e) => setCurrency(e.target.value)}
-                      className="w-full bg-white border border-slate-200 rounded-xl pl-10 pr-10 py-2.5 text-xs text-slate-800 focus:outline-none focus:border-[#d4af37] focus:ring-1 focus:ring-[#d4af37] appearance-none transition-all cursor-pointer"
-                    >
-                      <option value="INR">INR (Indian Rupee)</option>
-                      <option value="USD">USD (US Dollar)</option>
-                    </select>
-                    <span className="absolute inset-y-0 right-0 flex items-center pr-3.5 pointer-events-none text-slate-400">
-                      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-4 h-4">
-                        <path strokeLinecap="round" strokeLinejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5" />
-                      </svg>
-                    </span>
-                  </div>
-                </div>
-              )}
+
 
               {/* Forgot Password Link (Login only) */}
               {authTab === 'login' && (

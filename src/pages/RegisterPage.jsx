@@ -138,17 +138,7 @@ export default function RegisterPage({ }) {
             </div>
           </div>
 
-          <div className="space-y-1.5 text-left">
-            <label className="block text-[11px] font-bold text-slate-400 uppercase tracking-wide">Enter Your Currency</label>
-            <select
-              value={currency}
-              onChange={(e) => setCurrency(e.target.value)}
-              className="w-full bg-[#070e1b] border border-slate-800 rounded-xl px-3.5 py-2.5 text-xs text-slate-100 focus:outline-none focus:border-[#d4af37] transition-all cursor-pointer"
-            >
-              <option value="INR">INR (Indian Rupee)</option>
-              <option value="USD">USD (US Dollar)</option>
-            </select>
-          </div>
+
 
           <button
             type="submit"
